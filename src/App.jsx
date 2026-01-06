@@ -1,0 +1,830 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+  Menu, X, Globe as GlobeIcon, ArrowRight, Check, ChevronRight, 
+  Shield, Zap, BarChart3, Rocket, Lock, ChevronDown, Search,
+  CreditCard, Server, Activity, ShoppingBag, Key, Utensils, 
+  ScanBarcode, Printer, Receipt, Users, Clock, AlertTriangle, 
+  Smartphone, MapPin, CheckCircle2, XCircle, Copy, Mail
+} from 'lucide-react';
+
+// --- Assets & Data ---
+
+const CONTACT_EMAIL = "Facsystemshome@gmail.com";
+
+const REGIONS = {
+  "North America": ['US', 'CA'],
+  "South America": ['AR'],
+  "Europe": ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'SE', 'CH', 'PL', 'BE', 'AT', 'PT', 'GR', 'IE', 'NO', 'DK', 'FI', 'CZ', 'HU', 'RO', 'UA', 'HR', 'BG', 'SK', 'SI', 'LU', 'IS', 'EE', 'LV', 'LT', 'MT', 'CY', 'MC'],
+  "Oceania": ['AU']
+};
+
+// Pricing rates relative to 10 USD base.
+const COUNTRIES = [
+  { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$', rate: 1, bundle: 25 },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'CAD', symbol: '$', rate: 1.35, bundle: 34 },
+  { code: 'AR', name: 'Argentina', flag: '🇦🇷', currency: 'ARS', symbol: '$', price: 7000, bundle: 19999, isSpecial: true },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: '$', rate: 1.5, bundle: 38 },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£', rate: 0.8, bundle: 20 },
+  // Europe (Forced to Euro as requested)
+  { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'FR', name: 'France', flag: '🇫🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'NL', name: 'Netherlands', flag: '🇳🇱', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'SE', name: 'Sweden', flag: '🇸🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'CH', name: 'Switzerland', flag: '🇨🇭', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'PL', name: 'Poland', flag: '🇵🇱', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'BE', name: 'Belgium', flag: '🇧🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'AT', name: 'Austria', flag: '🇦🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'PT', name: 'Portugal', flag: '🇵🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'GR', name: 'Greece', flag: '🇬🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'IE', name: 'Ireland', flag: '🇮🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'NO', name: 'Norway', flag: '🇳🇴', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'DK', name: 'Denmark', flag: '🇩🇰', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'FI', name: 'Finland', flag: '🇫🇮', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'HU', name: 'Hungary', flag: '🇭🇺', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'RO', name: 'Romania', flag: '🇷🇴', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'UA', name: 'Ukraine', flag: '🇺🇦', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'HR', name: 'Croatia', flag: '🇭🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'BG', name: 'Bulgaria', flag: '🇧🇬', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'SK', name: 'Slovakia', flag: '🇸🇰', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'SI', name: 'Slovenia', flag: '🇸🇮', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'LU', name: 'Luxembourg', flag: '🇱🇺', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'IS', name: 'Iceland', flag: '🇮🇸', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'EE', name: 'Estonia', flag: '🇪🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'LV', name: 'Latvia', flag: '🇱🇻', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'LT', name: 'Lithuania', flag: '🇱🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'MT', name: 'Malta', flag: '🇲🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'CY', name: 'Cyprus', flag: '🇨🇾', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'MC', name: 'Monaco', flag: '🇲🇨', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+];
+
+const getCountry = (code) => COUNTRIES.find(c => c.code === code) || { ...COUNTRIES[0], code, name: code };
+
+const TRANSLATIONS = {
+  en: {
+    nav: { facstore: "FacStore OS", fackitchen: "FacKitchen", facaccess: "FacAccess", pricing: "Pricing", agency: "Agency" },
+    hero: { new: "New", agency_beta: "Fac Agency beta is live", title_start: "Software that", title_end: "means business.", subtitle: "The unified operating system for enterprise. Manage restaurant POS, retail inventory, and secure entry systems in one ecosystem.", contact_btn: "Contact Sales" },
+    agency: { title: "Fac Agency", desc: "Consultancy for the digital age. We architect your future while you run your business.", btn: "Request Access" },
+    pricing: { title: "Simple, transparent pricing", subtitle: "Choose the software that fits your business needs.", month: "/month", popular: "Most Popular", bundle_title: "Fac Systems One", bundle_desc: "The complete ecosystem. All 3 software suites in one powerful package." },
+    globe: { label: "Operating in 35+ Regions" },
+    products: {
+      facstore: {
+        title: "FacStore OS",
+        subtitle: "Retail Management & POS",
+        desc: "FacStore OS transforms how you run your retail business. From single-location bodegas to multi-chain supermarkets, our platform synchronizes inventory, sales, and employee performance in real-time. Experience a checkout process that is 40% faster than industry standards.",
+        subdesc: "Includes support for barcode scanning, receipt printing, and cash drawer management.",
+        features: ["Live Inventory Sync", "Staff Performance Tracking", "Offline-First Architecture", "Multi-Store Management"]
+      },
+      fackitchen: {
+        title: "FacKitchen",
+        subtitle: "Restaurant & Café POS",
+        desc: "Chaos in the kitchen is a thing of the past. FacKitchen integrates your Front of House POS directly with Kitchen Display Systems (KDS), ensuring orders are routed instantly and accurately. Manage table turnover, split checks effortlessly, and track ingredient usage down to the gram.",
+        subdesc: "Optimized for touchscreens and bump bars in high-heat environments.",
+        features: ["Instant Order Routing", "Ingredient-Level Inventory", "Table & Reservation Map", "Split Check & Tips"]
+      },
+      facaccess: {
+        title: "FacAccess",
+        subtitle: "Secure Entry Control",
+        desc: "Security meets convenience. FacAccess provides a robust on-premise solution for gated communities and corporate facilities. Generate QR guest passes, view live entry logs, and control gates securely. Our system integrates directly with physical barriers and biometric scanners.",
+        subdesc: "Local-first processing ensures zero latency and continued operation without internet.",
+        features: ["QR Guest Passes", "License Plate Recognition", "Biometric Integration", "Local-First Security Logs"]
+      }
+    }
+  }
+};
+
+// --- Animations & Graphics ---
+
+const RotatingGlobe = ({ width = 400, height = 400 }) => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let time = 0;
+    const particles = [];
+    const particleCount = 200;
+    const radius = Math.min(width, height) / 2.5;
+
+    for (let i = 0; i < particleCount; i++) {
+      const phi = Math.acos(-1 + (2 * i) / particleCount);
+      const theta = Math.sqrt(particleCount * Math.PI) * phi;
+      particles.push({
+        x: radius * Math.cos(theta) * Math.sin(phi),
+        y: radius * Math.sin(theta) * Math.sin(phi),
+        z: radius * Math.cos(phi)
+      });
+    }
+
+    const animate = () => {
+      time += 0.005;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = 'rgba(0,0,0,0)'; 
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.save();
+      ctx.translate(width / 2, height / 2);
+
+      particles.forEach(p => {
+        const rotX = p.x * Math.cos(time) - p.z * Math.sin(time);
+        const rotZ = p.x * Math.sin(time) + p.z * Math.cos(time);
+        
+        const scale = 250 / (250 - rotZ); 
+        const alpha = (rotZ + radius) / (2 * radius); 
+
+        if (scale > 0) {
+          ctx.beginPath();
+          const size = 2 * scale;
+          ctx.arc(rotX, p.y, size, 0, Math.PI * 2);
+          const brightness = Math.max(0.1, alpha);
+          
+          if (Math.random() > 0.98) {
+             ctx.fillStyle = `rgba(99, 102, 241, ${brightness})`; 
+          } else {
+             ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+          }
+          ctx.fill();
+        }
+      });
+      
+      const gradient = ctx.createRadialGradient(0, 0, radius * 0.5, 0, 0, radius * 1.2);
+      gradient.addColorStop(0, 'rgba(79, 70, 229, 0.1)'); 
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+      requestAnimationFrame(animate);
+    };
+
+    const animId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animId);
+  }, [width, height]);
+
+  return <canvas ref={canvasRef} width={width} height={height} className="max-w-full" />;
+};
+
+const AnimatedReceipt = () => (
+  <div className="w-48 bg-white text-black p-4 rounded shadow-xl mx-auto font-mono text-[10px] transform transition-all duration-1000 hover:scale-105">
+    <div className="text-center mb-4">
+      <div className="font-bold text-lg">FacStore</div>
+      <div className="text-neutral-400">Transaction #8492</div>
+    </div>
+    <div className="space-y-2 border-b border-dashed border-neutral-300 pb-4 mb-4">
+      <div className="flex justify-between"><span>Milk (1gal)</span><span>$4.50</span></div>
+      <div className="flex justify-between"><span>Eggs (12ct)</span><span>$3.20</span></div>
+      <div className="flex justify-between"><span>Bread</span><span>$2.80</span></div>
+    </div>
+    <div className="flex justify-between font-bold text-sm">
+      <span>TOTAL</span>
+      <span>$10.50</span>
+    </div>
+    <div className="mt-6 text-center text-neutral-400">Thank you for shopping!</div>
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent h-4 w-full animate-[scan_2s_linear_infinite]"></div>
+  </div>
+);
+
+const AnimatedKitchen = () => {
+  const [tickets, setTickets] = useState([1, 2, 3]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTickets(prev => {
+        const next = [...prev];
+        next.shift();
+        next.push(prev[prev.length - 1] + 1);
+        return next;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex space-x-2 overflow-hidden px-4">
+      {tickets.map(t => (
+        <div key={t} className="min-w-[120px] bg-neutral-800 border-t-4 border-orange-500 p-2 rounded animate-in slide-in-from-right duration-500">
+          <div className="text-orange-500 font-bold text-xs mb-1">ORDER #{t + 40}</div>
+          <div className="text-white text-[10px] space-y-1">
+            <div className="flex items-center"><CheckCircle2 className="w-3 h-3 mr-1 text-green-500"/> Burger</div>
+            <div className="flex items-center"><Clock className="w-3 h-3 mr-1 text-yellow-500"/> Fries</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const AnimatedGate = () => {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const interval = setInterval(() => setOpen(p => !p), 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative w-full h-32 bg-neutral-900 rounded-lg flex items-center justify-center overflow-hidden border border-neutral-800">
+      <div className="absolute bottom-0 w-full h-1 bg-neutral-700"></div>
+      <div className={`absolute bottom-4 left-10 w-2 h-16 bg-neutral-600 rounded-t origin-bottom transition-all duration-1000 ${open ? 'rotate-[-45deg]' : 'rotate-0'}`}></div>
+      <div className={`absolute bottom-4 left-12 w-48 h-2 bg-red-500 origin-left transition-all duration-1000 ${open ? 'rotate-[-45deg]' : 'rotate-0'}`}>
+         <div className="w-full h-full flex justify-between px-2">
+            <div className="w-4 h-full bg-white/50"></div>
+            <div className="w-4 h-full bg-white/50"></div>
+            <div className="w-4 h-full bg-white/50"></div>
+         </div>
+      </div>
+      <div className={`absolute top-4 right-4 px-2 py-1 rounded text-[10px] font-bold ${open ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+        {open ? 'ACCESS GRANTED' : 'LOCKED'}
+      </div>
+    </div>
+  );
+};
+
+const ContactModal = ({ isOpen, onClose }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(CONTACT_EMAIL);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 max-w-md w-full relative shadow-2xl">
+        <button onClick={onClose} className="absolute top-4 right-4 text-neutral-500 hover:text-white transition-colors">
+          <X className="w-6 h-6" />
+        </button>
+        <div className="text-center">
+          <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Mail className="w-8 h-8 text-indigo-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Contact Sales</h2>
+          <p className="text-neutral-400 mb-8">Reach out to our team directly. We typically respond within 24 hours.</p>
+          
+          <div className="flex items-center justify-between bg-black border border-neutral-800 rounded-xl p-4 mb-6 group hover:border-neutral-600 transition-colors">
+            <span className="text-white font-mono text-sm break-all">{CONTACT_EMAIL}</span>
+            <button onClick={handleCopy} className="ml-4 p-2 hover:bg-neutral-800 rounded-lg text-neutral-400 hover:text-white transition-colors">
+              {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+            </button>
+          </div>
+          
+          <button onClick={() => window.location.href = `mailto:${CONTACT_EMAIL}`} className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-neutral-200 transition-colors">
+            Open Email Client
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Components ---
+
+const Navbar = ({ navigate, currentCountry, t, openContact }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      scrolled ? 'bg-black/90 backdrop-blur-xl border-b border-neutral-800' : 'bg-transparent'
+    }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          
+          <div className="flex items-center space-x-8">
+            <button onClick={() => navigate('home')} className="flex items-center space-x-3 group">
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                 <div className="absolute inset-0 bg-indigo-600 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity blur-lg"></div>
+                 <span className="text-2xl font-bold text-white tracking-tighter z-10">Fac.</span>
+              </div>
+              <span className="font-bold text-lg tracking-wide text-neutral-200 group-hover:text-white transition-colors">Systems</span>
+            </button>
+            
+            <div className="hidden md:flex items-center space-x-1">
+              <button onClick={() => navigate('facstore')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.facstore}</button>
+              <button onClick={() => navigate('fackitchen')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.fackitchen}</button>
+              <button onClick={() => navigate('facaccess')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.facaccess}</button>
+              <button onClick={() => navigate('pricing')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.pricing}</button>
+              
+              <button className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-colors">
+                <span>{t.nav.agency}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+              </button>
+            </div>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-4">
+            <button 
+              onClick={() => navigate('country')}
+              className="flex items-center space-x-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors px-3 py-2 rounded-full hover:bg-neutral-800"
+            >
+              <span className="text-lg">{currentCountry.flag}</span>
+              <span>{currentCountry.code}</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            
+            <button 
+              onClick={openContact}
+              className="text-sm font-medium bg-white text-black px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+            >
+              Contact Sales
+            </button>
+          </div>
+
+          <div className="md:hidden">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-white">
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-20 left-0 right-0 bg-neutral-900 border-b border-neutral-800 p-4 shadow-2xl animate-in slide-in-from-top-5 duration-200">
+          <div className="flex flex-col space-y-4">
+             <button onClick={() => { navigate('facstore'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.facstore}</button>
+             <button onClick={() => { navigate('fackitchen'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.fackitchen}</button>
+             <button onClick={() => { navigate('facaccess'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.facaccess}</button>
+             <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.pricing}</button>
+            <div className="h-px bg-neutral-800 my-2"></div>
+            <button onClick={() => { navigate('country'); setIsMenuOpen(false); }} className="flex items-center space-x-3 p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">
+              <span className="text-xl">{currentCountry.flag}</span>
+              <span className="font-medium">Change Country ({currentCountry.code})</span>
+            </button>
+            <button onClick={openContact} className="text-center font-medium p-3 bg-white text-black rounded-lg">Contact Sales</button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", openContact }) => {
+  const content = t.products[productKey];
+  
+  const accentClass = {
+      indigo: "text-indigo-500 bg-indigo-600/20",
+      orange: "text-orange-500 bg-orange-600/20",
+      emerald: "text-emerald-500 bg-emerald-600/20"
+  }[accentColor];
+
+  return (
+    <div className="pt-24 min-h-screen bg-black text-white">
+       <div className="max-w-7xl mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-16">
+          <div className="w-full lg:w-1/2 animate-in slide-in-from-left duration-700">
+             <div className={`w-16 h-16 ${accentClass} rounded-2xl flex items-center justify-center mb-6`}>
+                {icon}
+             </div>
+             <h4 className={`font-bold uppercase tracking-widest text-sm mb-2 opacity-80 ${accentColor === 'orange' ? 'text-orange-500' : accentColor === 'emerald' ? 'text-emerald-500' : 'text-indigo-500'}`}>
+                {content.subtitle}
+             </h4>
+             <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">{content.title}</h1>
+             <p className="text-xl text-neutral-400 leading-relaxed mb-6">
+                {content.desc}
+             </p>
+             <p className="text-md text-neutral-500 leading-relaxed mb-8 italic">
+                {content.subdesc}
+             </p>
+             
+             {content.features && (
+                 <ul className="space-y-4 mb-8">
+                     {content.features.map((detail, idx) => (
+                         <li key={idx} className="flex items-start">
+                             <div className={`mt-1 mr-3 min-w-[20px] h-5 rounded-full flex items-center justify-center ${accentColor === 'orange' ? 'bg-orange-500/20 text-orange-500' : accentColor === 'emerald' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-indigo-500/20 text-indigo-500'}`}>
+                                 <Check className="w-3 h-3" />
+                             </div>
+                             <span className="text-neutral-300">{detail}</span>
+                         </li>
+                     ))}
+                 </ul>
+             )}
+
+             <div className="flex gap-4">
+                 <button onClick={openContact} className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-colors hover:scale-105 active:scale-95 transform duration-200">
+                    Book a Demo
+                 </button>
+             </div>
+          </div>
+          
+          <div className="w-full lg:w-1/2 animate-in slide-in-from-right duration-700 delay-200">
+             <div className="relative group">
+                <div className={`absolute -inset-4 bg-gradient-to-r ${accentColor === 'orange' ? 'from-orange-500/20 to-red-500/20' : accentColor === 'emerald' ? 'from-emerald-500/20 to-teal-500/20' : 'from-indigo-500/20 to-purple-500/20'} rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-1000`}></div>
+                <div className="relative bg-black rounded-3xl border border-neutral-800 shadow-2xl overflow-hidden aspect-video md:aspect-square lg:aspect-[4/3] flex items-center justify-center">
+                    {graphic}
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+  );
+};
+
+const PricingPage = ({ t, currentCountry, openContact }) => {
+  // Calculate price based on country
+  let price = 10;
+  let bundlePrice = 25;
+  let currency = 'USD';
+  let symbol = '$';
+
+  // Find country config
+  const countryConfig = COUNTRIES.find(c => c.code === currentCountry.code);
+  
+  if (countryConfig) {
+      currency = countryConfig.currency;
+      symbol = countryConfig.symbol;
+      
+      if (countryConfig.isSpecial) {
+          // Special fixed rates (Argentina)
+          price = countryConfig.price;
+          bundlePrice = countryConfig.bundle;
+      } else {
+          // Rate conversion logic (simplified)
+          price = Math.round(10 * countryConfig.rate);
+          if(countryConfig.bundle) {
+             bundlePrice = countryConfig.bundle; // Use pre-calc or specific
+          } else {
+             bundlePrice = Math.round(25 * countryConfig.rate);
+          }
+      }
+  }
+
+  const formatPrice = (val) => val.toLocaleString();
+
+  const plans = [
+    { title: "FacStore OS", icon: <ShoppingBag className="w-6 h-6"/>, color: "indigo" },
+    { title: "FacKitchen", icon: <Utensils className="w-6 h-6"/>, color: "orange" },
+    { title: "FacAccess", icon: <Key className="w-6 h-6"/>, color: "emerald" },
+  ];
+
+  return (
+    <div className="pt-32 pb-24 min-h-screen bg-black text-white relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-900/20 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="text-center mb-16">
+                <h1 className="text-5xl font-bold mb-6">{t.pricing.title}</h1>
+                <p className="text-xl text-neutral-400">{t.pricing.subtitle}</p>
+                <div className="mt-4 inline-block px-4 py-2 bg-neutral-900 rounded-full border border-neutral-800 text-sm text-neutral-300">
+                    Pricing for {currentCountry.name} ({currency})
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {/* Individual Plans */}
+                {plans.map((plan, i) => (
+                    <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 flex flex-col hover:border-neutral-700 transition-colors">
+                        <div className={`w-12 h-12 rounded-xl mb-6 flex items-center justify-center ${plan.color === 'indigo' ? 'bg-indigo-900/50 text-indigo-400' : plan.color === 'orange' ? 'bg-orange-900/50 text-orange-400' : 'bg-emerald-900/50 text-emerald-400'}`}>
+                            {plan.icon}
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">{plan.title}</h3>
+                        <div className="text-3xl font-bold mb-1 flex items-end">
+                            {symbol}{formatPrice(price)}
+                            <span className="text-sm font-normal text-neutral-500 ml-1 mb-1">{currency}{t.pricing.month}</span>
+                        </div>
+                        <p className="text-sm text-neutral-400 mb-8">Full license for single suite.</p>
+                        <ul className="space-y-3 mb-8 flex-1">
+                            <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> Unlimited Users</li>
+                            <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> 24/7 Support</li>
+                            <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> Analytics</li>
+                        </ul>
+                        <button onClick={openContact} className="w-full py-3 rounded-lg border border-neutral-700 hover:bg-neutral-800 transition-colors font-medium">Contact Sales</button>
+                    </div>
+                ))}
+
+                {/* Bundle Plan */}
+                <div className="bg-white text-black rounded-2xl p-1 relative flex flex-col transform md:scale-105 shadow-2xl">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg border border-neutral-800">
+                        {t.pricing.popular}
+                    </div>
+                    <div className="bg-neutral-100 rounded-xl p-6 flex-1 flex flex-col">
+                        <div className="w-12 h-12 rounded-xl mb-6 flex items-center justify-center bg-black text-white">
+                            <Zap className="w-6 h-6"/>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">{t.pricing.bundle_title}</h3>
+                        <div className="text-4xl font-bold mb-1 flex items-end">
+                            {symbol}{formatPrice(bundlePrice)}
+                            <span className="text-sm font-normal text-neutral-500 ml-1 mb-1">{currency}{t.pricing.month}</span>
+                        </div>
+                        <p className="text-sm text-neutral-600 mb-8">{t.pricing.bundle_desc}</p>
+                        
+                        <div className="space-y-3 mb-8 flex-1">
+                            <div className="flex items-center space-x-2 p-2 bg-white rounded border border-neutral-200">
+                                <ShoppingBag className="w-4 h-4 text-indigo-600"/> <span className="text-sm font-bold">FacStore OS</span>
+                            </div>
+                            <div className="flex items-center space-x-2 p-2 bg-white rounded border border-neutral-200">
+                                <Utensils className="w-4 h-4 text-orange-600"/> <span className="text-sm font-bold">FacKitchen</span>
+                            </div>
+                            <div className="flex items-center space-x-2 p-2 bg-white rounded border border-neutral-200">
+                                <Key className="w-4 h-4 text-emerald-600"/> <span className="text-sm font-bold">FacAccess</span>
+                            </div>
+                        </div>
+                        <button onClick={openContact} className="w-full py-4 bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors font-bold shadow-lg">
+                            Get the Bundle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  );
+};
+
+const CountrySelector = ({ setCountry, navigate }) => {
+  const [search, setSearch] = useState('');
+  
+  // Flatten countries for searching but use REGIONS for display
+  const allCountriesFlat = COUNTRIES;
+  
+  const filteredCountries = allCountriesFlat.filter(c => 
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Helper to ensure we can find the country object even if searching by code/name
+  const handleSelect = (country) => {
+      setCountry(country);
+      navigate('home');
+  };
+
+  return (
+    <div className="min-h-screen bg-black pt-32 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <button onClick={() => navigate('home')} className="mb-8 flex items-center text-neutral-400 hover:text-white transition-colors group">
+          <ArrowRight className="w-4 h-4 rotate-180 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
+        </button>
+        
+        <h1 className="text-4xl font-bold text-white mb-10">Select Region</h1>
+
+        <div className="relative mb-12 group">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-500 group-focus-within:text-white transition-colors" />
+          <input 
+            type="text" 
+            placeholder="Search country..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 rounded-xl bg-neutral-900 border border-neutral-800 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none shadow-xl transition-all"
+          />
+        </div>
+
+        {search ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {filteredCountries.map(c => (
+                    <button key={c.code} onClick={() => handleSelect(c)} className="flex items-center p-4 bg-neutral-900/50 rounded-xl border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800 transition-all text-left">
+                        <span className="text-2xl mr-3">{c.flag}</span>
+                        <span className="font-medium text-neutral-300">{c.name}</span>
+                    </button>
+                ))}
+            </div>
+        ) : (
+            <div className="space-y-12">
+                {Object.entries(REGIONS).map(([region, codes]) => (
+                    <div key={region} className="animate-in fade-in duration-700">
+                        <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-widest mb-4 border-b border-neutral-800 pb-2">{region}</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {codes.map(code => {
+                                const country = getCountry(code);
+                                // Fallback just in case getCountry returns default for a code that should exist
+                                if (!country) return null;
+                                return (
+                                    <button key={code} onClick={() => handleSelect(country)} className="flex items-center p-4 bg-neutral-900/30 rounded-xl border border-neutral-800 hover:border-indigo-500/50 hover:bg-neutral-800 transition-all text-left group">
+                                        <span className="text-2xl mr-3 group-hover:scale-110 transition-transform">{country.flag}</span>
+                                        <span className="font-medium text-neutral-300 group-hover:text-white">{country.name}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const LandingPage = ({ navigate, t, openContact }) => (
+  <div className="pt-20 bg-black min-h-screen">
+    {/* Hero Section */}
+    <div className="relative overflow-hidden">
+      {/* Dark Mode Background Effects */}
+      <div className="absolute top-0 right-1/4 -mt-20 w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[100px] pointer-events-none animate-pulse duration-[5000ms]"></div>
+      <div className="absolute bottom-0 left-1/4 -mb-20 w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32 relative z-10 flex flex-col md:flex-row items-center">
+        
+        <div className="w-full md:w-1/2 text-center md:text-left mb-12 md:mb-0">
+          <div className="inline-flex items-center space-x-2 bg-neutral-900/80 border border-neutral-800 backdrop-blur rounded-full p-1.5 pl-3 pr-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">{t.hero.new}</span>
+            <span className="text-neutral-300 text-xs font-medium">{t.hero.agency_beta}</span>
+            <ChevronRight className="w-3 h-3 text-neutral-500" />
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl lg:text-7xl font-bold tracking-tighter text-white mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+            {t.hero.title_start} <br className="hidden md:block" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-400 to-white animate-gradient-x">
+              {t.hero.title_end}
+            </span>
+          </h1>
+          
+          <p className="max-w-2xl text-xl text-neutral-400 mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+            {t.hero.subtitle}
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+            <button onClick={openContact} className="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-neutral-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:scale-105">
+              {t.hero.contact_btn}
+            </button>
+          </div>
+        </div>
+
+        {/* 3D Globe Section (Restored) */}
+        <div className="w-full md:w-1/2 flex justify-center items-center relative h-[400px] md:h-[500px]">
+           <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+           <RotatingGlobe width={500} height={500} />
+           
+           {/* Floating Info Card */}
+           <div className="absolute bottom-10 right-0 md:right-10 bg-black/80 backdrop-blur border border-neutral-800 p-4 rounded-xl shadow-2xl animate-in slide-in-from-right duration-1000 delay-500">
+              <div className="flex items-center space-x-3 mb-2">
+                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                 <span className="text-xs font-bold text-white uppercase tracking-wider">System Status</span>
+              </div>
+              <p className="text-white font-bold text-lg">{t.globe.label}</p>
+              <p className="text-neutral-500 text-xs mt-1">Latency: 12ms • Uptime: 99.999%</p>
+           </div>
+        </div>
+
+      </div>
+    </div>
+
+    {/* Agency Teaser Banner */}
+    <div className="w-full bg-neutral-900 border-y border-neutral-800 py-16 overflow-hidden relative">
+      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between relative z-10">
+        <div className="mb-6 md:mb-0 text-center md:text-left">
+          <h3 className="text-3xl font-bold mb-3 flex items-center justify-center md:justify-start text-white">
+            <span className="text-indigo-500 mr-3">✦</span> {t.agency.title}
+          </h3>
+          <p className="text-neutral-400 max-w-lg text-lg">
+            {t.agency.desc}
+          </p>
+        </div>
+        <button onClick={openContact} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/25">
+          {t.agency.btn}
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// --- Main App Component ---
+
+const App = () => {
+  const [page, setPage] = useState('home');
+  const [country, setCountry] = useState(COUNTRIES[0]); // Default US
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  // --- Geolocation Logic ---
+  useEffect(() => {
+    const browserLang = navigator.language.split('-')[0];
+    const regionCode = navigator.language.split('-')[1];
+    let detectedCountry = null;
+    
+    if (regionCode) detectedCountry = COUNTRIES.find(c => c.code === regionCode);
+    if (!detectedCountry && browserLang) detectedCountry = COUNTRIES.find(c => c.lang === browserLang);
+    if (detectedCountry) setCountry(detectedCountry);
+  }, []);
+
+  const t = useMemo(() => TRANSLATIONS['en'], []); // Enforced EN for simplicity
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
+
+  const toggleContact = () => setIsContactOpen(!isContactOpen);
+
+  const renderPage = () => {
+    switch(page) {
+      case 'home':
+        return (
+          <>
+            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+            <LandingPage navigate={setPage} t={t} openContact={toggleContact} />
+            <footer className="bg-black text-white py-16 border-t border-neutral-900">
+              <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl font-bold tracking-tighter">Fac.</span>
+                  </div>
+                  <p className="text-neutral-500 text-sm leading-relaxed">
+                    Empowering digital enterprises.
+                  </p>
+                  <p className="text-neutral-600 text-xs">© 2026 Fac Systems Software Inc.</p>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-neutral-500">Products</h4>
+                  <ul className="space-y-3 text-sm text-neutral-400">
+                    <li><button onClick={() => setPage('facstore')} className="hover:text-white transition-colors text-left">{t.nav.facstore}</button></li>
+                    <li><button onClick={() => setPage('fackitchen')} className="hover:text-white transition-colors text-left">{t.nav.fackitchen}</button></li>
+                    <li><button onClick={() => setPage('facaccess')} className="hover:text-white transition-colors text-left">{t.nav.facaccess}</button></li>
+                  </ul>
+                </div>
+              </div>
+            </footer>
+          </>
+        );
+      case 'pricing':
+        return (
+            <>
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <PricingPage t={t} currentCountry={country} openContact={toggleContact} />
+            </>
+        );
+      case 'country':
+        return <CountrySelector setCountry={setCountry} navigate={setPage} />;
+      case 'facstore':
+        return (
+            <>
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <ProductPage 
+                    t={t} 
+                    productKey="facstore" 
+                    icon={<ShoppingBag className="w-8 h-8" />} 
+                    graphic={
+                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
+                            <div className="relative">
+                                <AnimatedReceipt />
+                                <div className="absolute -bottom-4 -right-4 bg-green-500 text-black text-xs font-bold px-2 py-1 rounded shadow-lg animate-bounce">Paid</div>
+                            </div>
+                        </div>
+                    }
+                    accentColor="indigo"
+                    openContact={toggleContact}
+                />
+            </>
+        );
+      case 'fackitchen':
+        return (
+            <>
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <ProductPage 
+                    t={t} 
+                    productKey="fackitchen" 
+                    icon={<Utensils className="w-8 h-8" />} 
+                    graphic={
+                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
+                            <div className="w-full max-w-md">
+                                <div className="flex justify-between text-neutral-500 text-xs mb-2 font-mono"><span>KDS-01</span><span>LIVE</span></div>
+                                <AnimatedKitchen />
+                            </div>
+                        </div>
+                    }
+                    accentColor="orange"
+                    openContact={toggleContact}
+                />
+            </>
+        );
+      case 'facaccess':
+        return (
+            <>
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <ProductPage 
+                    t={t} 
+                    productKey="facaccess" 
+                    icon={<Key className="w-8 h-8" />} 
+                    graphic={
+                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
+                            <div className="w-full max-w-sm">
+                                <AnimatedGate />
+                            </div>
+                        </div>
+                    }
+                    accentColor="emerald"
+                    openContact={toggleContact}
+                />
+            </>
+        );
+      default:
+        return <LandingPage navigate={setPage} t={t} openContact={toggleContact} />;
+    }
+  };
+
+  return (
+    <div className="font-sans antialiased text-white bg-black selection:bg-indigo-500/30 selection:text-white min-h-screen">
+      {renderPage()}
+      <ContactModal isOpen={isContactOpen} onClose={toggleContact} />
+    </div>
+  );
+};
+
+export default App;
