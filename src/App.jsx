@@ -382,91 +382,6 @@ const ContactModal = ({ isOpen, onClose }) => {
   );
 };
 
-const PayPalSubscriptionButton = () => {
-  const buttonRef = useRef(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadPaypalScript = () => {
-        if (window.paypal) {
-            renderButton();
-            return;
-        }
-
-        if (document.getElementById('paypal-sdk')) {
-            const script = document.getElementById('paypal-sdk');
-            script.addEventListener('load', renderButton);
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.id = 'paypal-sdk';
-        script.src = "https://www.paypal.com/sdk/js?client-id=AcXwg9bZo6LLx44x5jmu61ij_UjbVwlVK5JIRQq71HDCmI9EXbRB9eHMIUMZ4z14x2-wcACEeVohUori&vault=true&intent=subscription";
-        script.setAttribute('data-sdk-integration-source', 'button-factory');
-        script.async = true;
-        script.onload = renderButton;
-        script.onerror = () => { if(isMounted) setError("Failed to load PayPal SDK"); };
-        document.body.appendChild(script);
-    };
-
-    const renderButton = () => {
-        if (!isMounted || !buttonRef.current || !window.paypal) return;
-        
-        if (buttonRef.current.innerHTML !== "") return;
-
-        try {
-            window.paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'gold',
-                    layout: 'vertical',
-                    label: 'subscribe'
-                },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        plan_id: 'P-5CV08645A2990653BNFO5QRI'
-                    });
-                },
-                onApprove: function(data, actions) {
-                    alert('Subscription successful! Subscription ID: ' + data.subscriptionID);
-                },
-                onError: function (err) {
-                    console.error("PayPal Button Error:", err);
-                    if(isMounted) setError("PayPal Error");
-                }
-            }).render(buttonRef.current).catch(err => {
-                console.error("PayPal Render Error:", err);
-                if(isMounted) setError("Failed to render PayPal button");
-            });
-        } catch (err) {
-            console.error("PayPal Initialization Error:", err);
-            if(isMounted) setError("Failed to initialize PayPal");
-        }
-    };
-
-    loadPaypalScript();
-
-    return () => {
-        isMounted = false;
-        if (buttonRef.current) {
-            buttonRef.current.innerHTML = ""; 
-        }
-        const script = document.getElementById('paypal-sdk');
-        if (script) {
-            script.removeEventListener('load', renderButton);
-        }
-    };
-  }, []);
-
-  if (error) {
-      return <div className="text-red-500 text-xs mt-2">Payment system unavailable. Please contact sales.</div>;
-  }
-
-  return <div ref={buttonRef} className="w-full mt-4 min-h-[40px] relative z-0"></div>;
-};
-
 // --- Components ---
 
 const Navbar = ({ navigate, currentCountry, t, openContact }) => {
@@ -552,82 +467,6 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
         </div>
       )}
     </nav>
-  );
-};
-
-const SolutionsPage = ({ t, navigate }) => {
-  const solutions = [
-    { 
-      id: 'facstore', 
-      title: t.products.facstore.title, 
-      desc: t.products.facstore.desc, 
-      icon: <ShoppingBag className="w-10 h-10 text-indigo-500" />,
-      color: "border-indigo-500/30 hover:border-indigo-500"
-    },
-    { 
-      id: 'fackitchen', 
-      title: t.products.fackitchen.title, 
-      desc: t.products.fackitchen.desc, 
-      icon: <Utensils className="w-10 h-10 text-orange-500" />,
-      color: "border-orange-500/30 hover:border-orange-500"
-    },
-    { 
-      id: 'facaccess', 
-      title: t.products.facaccess.title, 
-      desc: t.products.facaccess.desc, 
-      icon: <Key className="w-10 h-10 text-emerald-500" />,
-      color: "border-emerald-500/30 hover:border-emerald-500"
-    },
-    { 
-      id: 'ciro', 
-      title: t.ciro.title, 
-      desc: t.ciro.desc, 
-      icon: <Users className="w-10 h-10 text-pink-500" />,
-      color: "border-pink-500/30 hover:border-pink-500"
-    },
-    { 
-      id: 'agency', 
-      title: t.agency.title, 
-      desc: t.agency.desc, 
-      icon: <Code className="w-10 h-10 text-indigo-400" />,
-      color: "border-indigo-400/30 hover:border-indigo-400"
-    }
-  ];
-
-  return (
-    <div className="pt-32 pb-24 min-h-screen bg-black text-white relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="text-center mb-20">
-                <h1 className="text-5xl font-bold mb-6">Our Ecosystem</h1>
-                <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
-                    A suite of powerful tools designed to run every aspect of your business.
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {solutions.map((item) => (
-                    <button 
-                        key={item.id} 
-                        onClick={() => navigate(item.id)}
-                        className={`text-left bg-neutral-900/50 border ${item.color} rounded-2xl p-8 transition-all hover:scale-[1.02] hover:bg-neutral-900 group`}
-                    >
-                        <div className="mb-6 bg-neutral-950 w-16 h-16 rounded-xl flex items-center justify-center border border-neutral-800 group-hover:border-neutral-700">
-                            {item.icon}
-                        </div>
-                        <h3 className="text-2xl font-bold mb-3 flex items-center text-white">
-                            {item.title}
-                            <ArrowRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1" />
-                        </h3>
-                        <p className="text-neutral-400 leading-relaxed text-sm">
-                            {item.desc}
-                        </p>
-                    </button>
-                ))}
-            </div>
-        </div>
-    </div>
   );
 };
 
@@ -769,12 +608,7 @@ const PricingPage = ({ t, currentCountry, openContact }) => {
                             <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> 24/7 Support</li>
                             <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> Analytics</li>
                         </ul>
-                        {/* Conditionally render PayPal button for FacStore OS */}
-                        {plan.title === "FacStore OS" ? (
-                            <PayPalSubscriptionButton />
-                        ) : (
-                            <button onClick={openContact} className="w-full py-3 rounded-lg border border-neutral-700 hover:bg-neutral-800 transition-colors font-medium">Contact Sales</button>
-                        )}
+                        <button onClick={openContact} className="w-full py-3 rounded-lg border border-neutral-700 hover:bg-neutral-800 transition-colors font-medium">Contact Sales</button>
                     </div>
                 ))}
 
@@ -934,6 +768,82 @@ const DashboardPreview = ({ t }) => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const SolutionsPage = ({ t, navigate }) => {
+  const solutions = [
+    { 
+      id: 'facstore', 
+      title: t.products.facstore.title, 
+      desc: t.products.facstore.desc, 
+      icon: <ShoppingBag className="w-10 h-10 text-indigo-500" />,
+      color: "border-indigo-500/30 hover:border-indigo-500"
+    },
+    { 
+      id: 'fackitchen', 
+      title: t.products.fackitchen.title, 
+      desc: t.products.fackitchen.desc, 
+      icon: <Utensils className="w-10 h-10 text-orange-500" />,
+      color: "border-orange-500/30 hover:border-orange-500"
+    },
+    { 
+      id: 'facaccess', 
+      title: t.products.facaccess.title, 
+      desc: t.products.facaccess.desc, 
+      icon: <Key className="w-10 h-10 text-emerald-500" />,
+      color: "border-emerald-500/30 hover:border-emerald-500"
+    },
+    { 
+      id: 'ciro', 
+      title: t.ciro.title, 
+      desc: t.ciro.desc, 
+      icon: <Users className="w-10 h-10 text-pink-500" />,
+      color: "border-pink-500/30 hover:border-pink-500"
+    },
+    { 
+      id: 'agency', 
+      title: t.agency.title, 
+      desc: t.agency.desc, 
+      icon: <Code className="w-10 h-10 text-indigo-400" />,
+      color: "border-indigo-400/30 hover:border-indigo-400"
+    }
+  ];
+
+  return (
+    <div className="pt-32 pb-24 min-h-screen bg-black text-white relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="text-center mb-20">
+                <h1 className="text-5xl font-bold mb-6">Our Ecosystem</h1>
+                <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
+                    A suite of powerful tools designed to run every aspect of your business.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {solutions.map((item) => (
+                    <button 
+                        key={item.id} 
+                        onClick={() => navigate(item.id)}
+                        className={`text-left bg-neutral-900/50 border ${item.color} rounded-2xl p-8 transition-all hover:scale-[1.02] hover:bg-neutral-900 group`}
+                    >
+                        <div className="mb-6 bg-neutral-950 w-16 h-16 rounded-xl flex items-center justify-center border border-neutral-800 group-hover:border-neutral-700">
+                            {item.icon}
+                        </div>
+                        <h3 className="text-2xl font-bold mb-3 flex items-center text-white">
+                            {item.title}
+                            <ArrowRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1" />
+                        </h3>
+                        <p className="text-neutral-400 leading-relaxed text-sm">
+                            {item.desc}
+                        </p>
+                    </button>
+                ))}
+            </div>
+        </div>
     </div>
   );
 };
