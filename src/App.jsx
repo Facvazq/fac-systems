@@ -4,7 +4,8 @@ import {
   Shield, Zap, BarChart3, Rocket, Lock, ChevronDown, Search,
   CreditCard, Server, Activity, ShoppingBag, Key, Utensils, 
   ScanBarcode, Printer, Receipt, Users, Clock, AlertTriangle, 
-  Smartphone, MapPin, CheckCircle2, XCircle, Copy, Mail
+  Smartphone, MapPin, CheckCircle2, XCircle, Copy, Mail,
+  Layout, Code, Palette, Kanban, UserPlus, Filter
 } from 'lucide-react';
 
 // --- Assets & Data ---
@@ -18,14 +19,19 @@ const REGIONS = {
   "Oceania": ['AU']
 };
 
-// Pricing rates relative to 10 USD base.
 const COUNTRIES = [
+  // North America
   { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$', rate: 1, bundle: 25 },
   { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'CAD', symbol: '$', rate: 1.35, bundle: 34 },
+  
+  // South America
   { code: 'AR', name: 'Argentina', flag: '🇦🇷', currency: 'ARS', symbol: '$', price: 7000, bundle: 19999, isSpecial: true },
+  
+  // Oceania
   { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: '$', rate: 1.5, bundle: 38 },
+  
+  // Europe
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£', rate: 0.8, bundle: 20 },
-  // Europe (Forced to Euro as requested)
   { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
   { code: 'FR', name: 'France', flag: '🇫🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
   { code: 'IT', name: 'Italy', flag: '🇮🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
@@ -64,36 +70,84 @@ const getCountry = (code) => COUNTRIES.find(c => c.code === code) || { ...COUNTR
 
 const TRANSLATIONS = {
   en: {
-    nav: { facstore: "FacStore OS", fackitchen: "FacKitchen", facaccess: "FacAccess", pricing: "Pricing", agency: "Agency" },
-    hero: { new: "New", agency_beta: "Fac Agency beta is live", title_start: "Software that", title_end: "means business.", subtitle: "The unified operating system for enterprise. Manage restaurant POS, retail inventory, and secure entry systems in one ecosystem.", contact_btn: "Contact Sales" },
-    agency: { title: "Fac Agency", desc: "Consultancy for the digital age. We architect your future while you run your business.", btn: "Request Access" },
+    nav: { facstore: "FacStore OS", fackitchen: "FacKitchen", facaccess: "FacAccess", ciro: "Ciro", pricing: "Pricing", agency: "Fac Agency" },
+    hero: { new: "New", agency_news: "Ciro CRM is coming soon", title_start: "Software that", title_end: "means business.", subtitle: "The unified operating system for enterprise. Manage restaurant POS, retail inventory, and secure entry systems in one ecosystem.", contact_btn: "Contact Sales" },
+    agency: { 
+        title: "Fac Agency", 
+        desc: "We build your digital presence. Fac Agency is our premium web development service dedicated to building high-performance websites and digital products for businesses.", 
+        btn: "Join Waitlist",
+        status: "Coming Soon"
+    },
+    ciro: {
+        title: "Ciro CRM",
+        subtitle: "The All-Free CRM",
+        desc: "Manage customer relationships without the cost. Ciro is our brand new, completely free Customer Relationship Management tool designed to help you track leads, manage pipeline, and close deals faster.",
+        status: "Coming Soon!"
+    },
     pricing: { title: "Simple, transparent pricing", subtitle: "Choose the software that fits your business needs.", month: "/month", popular: "Most Popular", bundle_title: "Fac Systems One", bundle_desc: "The complete ecosystem. All 3 software suites in one powerful package." },
     globe: { label: "Operating in 35+ Regions" },
+    features: { title: "Built for scale. Designed for speed.", global: "Global Infrastructure", security: "Enterprise Security", analytics: "Real-time Analytics" },
     products: {
       facstore: {
         title: "FacStore OS",
         subtitle: "Retail Management & POS",
-        desc: "FacStore OS transforms how you run your retail business. From single-location bodegas to multi-chain supermarkets, our platform synchronizes inventory, sales, and employee performance in real-time. Experience a checkout process that is 40% faster than industry standards.",
+        desc: "FacStore OS transforms how you run your retail business. From single-location bodegas to multi-chain supermarkets, our platform synchronizes inventory, sales, and employee performance in real-time.",
         subdesc: "Includes support for barcode scanning, receipt printing, and cash drawer management.",
         features: ["Live Inventory Sync", "Staff Performance Tracking", "Offline-First Architecture", "Multi-Store Management"]
       },
       fackitchen: {
         title: "FacKitchen",
         subtitle: "Restaurant & Café POS",
-        desc: "Chaos in the kitchen is a thing of the past. FacKitchen integrates your Front of House POS directly with Kitchen Display Systems (KDS), ensuring orders are routed instantly and accurately. Manage table turnover, split checks effortlessly, and track ingredient usage down to the gram.",
+        desc: "Chaos in the kitchen is a thing of the past. FacKitchen integrates your Front of House POS directly with Kitchen Display Systems (KDS), ensuring orders are routed instantly and accurately.",
         subdesc: "Optimized for touchscreens and bump bars in high-heat environments.",
         features: ["Instant Order Routing", "Ingredient-Level Inventory", "Table & Reservation Map", "Split Check & Tips"]
       },
       facaccess: {
         title: "FacAccess",
         subtitle: "Secure Entry Control",
-        desc: "Security meets convenience. FacAccess provides a robust on-premise solution for gated communities and corporate facilities. Generate QR guest passes, view live entry logs, and control gates securely. Our system integrates directly with physical barriers and biometric scanners.",
+        desc: "Security meets convenience. FacAccess provides a robust on-premise solution for gated communities and corporate facilities. Generate QR guest passes, view live entry logs, and control gates securely.",
         subdesc: "Local-first processing ensures zero latency and continued operation without internet.",
         features: ["QR Guest Passes", "License Plate Recognition", "Biometric Integration", "Local-First Security Logs"]
       }
     }
   }
 };
+
+const FEATURES = [
+  {
+    key: "global",
+    title: "Global Infrastructure",
+    desc: "Deploy instantly across 35+ regions with Fac Systems Cloud.",
+    icon: <GlobeIcon className="w-6 h-6 text-white" />,
+    colSpan: "col-span-12 md:col-span-8",
+    bg: "bg-neutral-900 border border-neutral-800"
+  },
+  {
+    key: "security",
+    title: "Enterprise Security",
+    desc: "Bank-grade encryption for all data streams.",
+    icon: <Lock className="w-6 h-6 text-white" />,
+    colSpan: "col-span-12 md:col-span-4",
+    bg: "bg-neutral-800 border border-neutral-700"
+  },
+  {
+    key: "analytics",
+    title: "Real-time Analytics",
+    desc: "Monitor performance with millisecond precision.",
+    icon: <BarChart3 className="w-6 h-6 text-white" />,
+    colSpan: "col-span-12 md:col-span-4",
+    bg: "bg-indigo-900/20 border border-indigo-500/30"
+  },
+  {
+    key: "ciro_feat",
+    title: "Ciro CRM",
+    desc: "Our upcoming 100% Free CRM for growth.",
+    icon: <Users className="w-6 h-6 text-white" />,
+    colSpan: "col-span-12 md:col-span-8",
+    bg: "bg-gradient-to-r from-pink-900 to-rose-900 border border-pink-700",
+    isCiro: true
+  }
+];
 
 // --- Animations & Graphics ---
 
@@ -244,6 +298,50 @@ const AnimatedGate = () => {
   );
 };
 
+const AnimatedCiro = () => (
+    <div className="w-full h-full bg-neutral-900 rounded-xl p-4 flex gap-4 overflow-hidden border border-neutral-800">
+        {[
+            { title: "LEADS", color: "bg-pink-500", items: 2 },
+            { title: "CONTACTED", color: "bg-purple-500", items: 1 },
+            { title: "WON", color: "bg-green-500", items: 3 }
+        ].map((col, i) => (
+            <div key={i} className="flex-1 bg-neutral-800/50 rounded-lg p-2 flex flex-col gap-2">
+                <div className={`text-[10px] font-bold ${col.color.replace('bg-', 'text-')} mb-1 uppercase`}>{col.title}</div>
+                {Array.from({length: col.items}).map((_, j) => (
+                    <div key={j} className="bg-neutral-700 p-2 rounded shadow-sm hover:scale-105 transition-transform cursor-pointer">
+                        <div className="w-8 h-2 bg-neutral-600 rounded mb-1"></div>
+                        <div className="w-full h-1.5 bg-neutral-600/50 rounded"></div>
+                    </div>
+                ))}
+            </div>
+        ))}
+    </div>
+);
+
+const AnimatedAgency = () => (
+    <div className="w-full h-full bg-neutral-950 rounded-xl p-2 border border-neutral-800 flex flex-col font-mono text-[10px]">
+        <div className="flex gap-1.5 mb-2 p-2 border-b border-neutral-800">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+        </div>
+        <div className="p-2 text-indigo-400">
+            <div>&lt;html&gt;</div>
+            <div className="pl-2">&lt;body&gt;</div>
+            <div className="pl-4 text-white">&lt;h1&gt;Building Your Future&lt;/h1&gt;</div>
+            <div className="pl-4 text-neutral-500">&lt;!-- Fac Agency Magic --&gt;</div>
+            <div className="pl-2">&lt;/body&gt;</div>
+            <div>&lt;/html&gt;</div>
+        </div>
+        <div className="mt-auto p-2">
+            <div className="w-full h-1 bg-indigo-500/20 rounded-full overflow-hidden">
+                <div className="w-2/3 h-full bg-indigo-500 animate-[width_2s_ease-in-out_infinite]"></div>
+            </div>
+            <div className="text-right text-indigo-500 mt-1">Compiling...</div>
+        </div>
+    </div>
+);
+
 const ContactModal = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
 
@@ -312,26 +410,25 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
               <span className="font-bold text-lg tracking-wide text-neutral-200 group-hover:text-white transition-colors">Systems</span>
             </button>
             
-            <div className="hidden md:flex items-center space-x-1">
+            <div className="hidden lg:flex items-center space-x-1">
               <button onClick={() => navigate('facstore')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.facstore}</button>
               <button onClick={() => navigate('fackitchen')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.fackitchen}</button>
               <button onClick={() => navigate('facaccess')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.facaccess}</button>
+              <button onClick={() => navigate('ciro')} className="px-4 py-2 text-sm font-medium text-pink-400 hover:text-pink-300 transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.ciro}</button>
               <button onClick={() => navigate('pricing')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.pricing}</button>
-              
-              <button className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-colors">
+              <button onClick={() => navigate('agency')} className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-colors">
                 <span>{t.nav.agency}</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
               </button>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             <button 
               onClick={() => navigate('country')}
               className="flex items-center space-x-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors px-3 py-2 rounded-full hover:bg-neutral-800"
             >
               <span className="text-lg">{currentCountry.flag}</span>
-              <span>{currentCountry.code}</span>
+              <span className="font-bold">{currentCountry.name}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             
@@ -343,7 +440,7 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
             </button>
           </div>
 
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-white">
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -352,11 +449,13 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
       </div>
 
       {isMenuOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-neutral-900 border-b border-neutral-800 p-4 shadow-2xl animate-in slide-in-from-top-5 duration-200">
+        <div className="lg:hidden absolute top-20 left-0 right-0 bg-neutral-900 border-b border-neutral-800 p-4 shadow-2xl animate-in slide-in-from-top-5 duration-200">
           <div className="flex flex-col space-y-4">
              <button onClick={() => { navigate('facstore'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.facstore}</button>
              <button onClick={() => { navigate('fackitchen'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.fackitchen}</button>
              <button onClick={() => { navigate('facaccess'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.facaccess}</button>
+             <button onClick={() => { navigate('ciro'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-pink-400 hover:bg-neutral-800 rounded-lg">{t.nav.ciro}</button>
+             <button onClick={() => { navigate('agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-indigo-400 hover:bg-neutral-800 rounded-lg">{t.nav.agency}</button>
              <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.pricing}</button>
             <div className="h-px bg-neutral-800 my-2"></div>
             <button onClick={() => { navigate('country'); setIsMenuOpen(false); }} className="flex items-center space-x-3 p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">
@@ -371,14 +470,20 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
   );
 };
 
-const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", openContact }) => {
-  const content = t.products[productKey];
+const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", openContact, isAgency, isCiro }) => {
+  let content = {};
+  if (isAgency) content = t.agency;
+  else if (isCiro) content = t.ciro;
+  else content = t.products[productKey];
   
   const accentClass = {
       indigo: "text-indigo-500 bg-indigo-600/20",
       orange: "text-orange-500 bg-orange-600/20",
-      emerald: "text-emerald-500 bg-emerald-600/20"
+      emerald: "text-emerald-500 bg-emerald-600/20",
+      pink: "text-pink-500 bg-pink-600/20"
   }[accentColor];
+
+  const statusLabel = isAgency ? t.agency.status : isCiro ? t.ciro.status : null;
 
   return (
     <div className="pt-24 min-h-screen bg-black text-white">
@@ -387,16 +492,25 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
              <div className={`w-16 h-16 ${accentClass} rounded-2xl flex items-center justify-center mb-6`}>
                 {icon}
              </div>
-             <h4 className={`font-bold uppercase tracking-widest text-sm mb-2 opacity-80 ${accentColor === 'orange' ? 'text-orange-500' : accentColor === 'emerald' ? 'text-emerald-500' : 'text-indigo-500'}`}>
-                {content.subtitle}
+             <h4 className={`font-bold uppercase tracking-widest text-sm mb-2 opacity-80 ${accentColor === 'orange' ? 'text-orange-500' : accentColor === 'emerald' ? 'text-emerald-500' : accentColor === 'pink' ? 'text-pink-500' : 'text-indigo-500'}`}>
+                {content.subtitle || "Enterprise Software"}
              </h4>
              <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">{content.title}</h1>
+             
+             {statusLabel && (
+                 <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold mb-8 ${accentColor === 'pink' ? 'bg-pink-500/20 text-pink-400' : 'bg-indigo-500/20 text-indigo-400'}`}>
+                     {statusLabel}
+                 </div>
+             )}
+
              <p className="text-xl text-neutral-400 leading-relaxed mb-6">
                 {content.desc}
              </p>
-             <p className="text-md text-neutral-500 leading-relaxed mb-8 italic">
-                {content.subdesc}
-             </p>
+             {content.subdesc && (
+                <p className="text-md text-neutral-500 leading-relaxed mb-8 italic">
+                    {content.subdesc}
+                </p>
+             )}
              
              {content.features && (
                  <ul className="space-y-4 mb-8">
@@ -413,14 +527,14 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
 
              <div className="flex gap-4">
                  <button onClick={openContact} className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-colors hover:scale-105 active:scale-95 transform duration-200">
-                    Book a Demo
+                    {content.btn || "Book a Demo"}
                  </button>
              </div>
           </div>
           
           <div className="w-full lg:w-1/2 animate-in slide-in-from-right duration-700 delay-200">
              <div className="relative group">
-                <div className={`absolute -inset-4 bg-gradient-to-r ${accentColor === 'orange' ? 'from-orange-500/20 to-red-500/20' : accentColor === 'emerald' ? 'from-emerald-500/20 to-teal-500/20' : 'from-indigo-500/20 to-purple-500/20'} rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-1000`}></div>
+                <div className={`absolute -inset-4 bg-gradient-to-r ${accentColor === 'orange' ? 'from-orange-500/20 to-red-500/20' : accentColor === 'emerald' ? 'from-emerald-500/20 to-teal-500/20' : accentColor === 'pink' ? 'from-pink-500/20 to-purple-500/20' : 'from-indigo-500/20 to-purple-500/20'} rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-1000`}></div>
                 <div className="relative bg-black rounded-3xl border border-neutral-800 shadow-2xl overflow-hidden aspect-video md:aspect-square lg:aspect-[4/3] flex items-center justify-center">
                     {graphic}
                 </div>
@@ -432,13 +546,11 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
 };
 
 const PricingPage = ({ t, currentCountry, openContact }) => {
-  // Calculate price based on country
   let price = 10;
   let bundlePrice = 25;
   let currency = 'USD';
   let symbol = '$';
 
-  // Find country config
   const countryConfig = COUNTRIES.find(c => c.code === currentCountry.code);
   
   if (countryConfig) {
@@ -446,14 +558,12 @@ const PricingPage = ({ t, currentCountry, openContact }) => {
       symbol = countryConfig.symbol;
       
       if (countryConfig.isSpecial) {
-          // Special fixed rates (Argentina)
           price = countryConfig.price;
           bundlePrice = countryConfig.bundle;
       } else {
-          // Rate conversion logic (simplified)
           price = Math.round(10 * countryConfig.rate);
           if(countryConfig.bundle) {
-             bundlePrice = countryConfig.bundle; // Use pre-calc or specific
+             bundlePrice = countryConfig.bundle; 
           } else {
              bundlePrice = Math.round(25 * countryConfig.rate);
           }
@@ -476,13 +586,12 @@ const PricingPage = ({ t, currentCountry, openContact }) => {
             <div className="text-center mb-16">
                 <h1 className="text-5xl font-bold mb-6">{t.pricing.title}</h1>
                 <p className="text-xl text-neutral-400">{t.pricing.subtitle}</p>
-                <div className="mt-4 inline-block px-4 py-2 bg-neutral-900 rounded-full border border-neutral-800 text-sm text-neutral-300">
-                    Pricing for {currentCountry.name} ({currency})
+                <div className="mt-4 inline-block px-4 py-2 bg-neutral-900 rounded-full border border-neutral-800 text-lg text-white flex items-center justify-center">
+                    Pricing for <span className="mx-2 text-2xl">{currentCountry.flag}</span> <span className="font-bold">{currentCountry.name}</span> <span className="ml-2 text-neutral-400">({currency})</span>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {/* Individual Plans */}
                 {plans.map((plan, i) => (
                     <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 flex flex-col hover:border-neutral-700 transition-colors">
                         <div className={`w-12 h-12 rounded-xl mb-6 flex items-center justify-center ${plan.color === 'indigo' ? 'bg-indigo-900/50 text-indigo-400' : plan.color === 'orange' ? 'bg-orange-900/50 text-orange-400' : 'bg-emerald-900/50 text-emerald-400'}`}>
@@ -503,7 +612,6 @@ const PricingPage = ({ t, currentCountry, openContact }) => {
                     </div>
                 ))}
 
-                {/* Bundle Plan */}
                 <div className="bg-white text-black rounded-2xl p-1 relative flex flex-col transform md:scale-105 shadow-2xl">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg border border-neutral-800">
                         {t.pricing.popular}
@@ -543,15 +651,11 @@ const PricingPage = ({ t, currentCountry, openContact }) => {
 
 const CountrySelector = ({ setCountry, navigate }) => {
   const [search, setSearch] = useState('');
-  
-  // Flatten countries for searching but use REGIONS for display
   const allCountriesFlat = COUNTRIES;
-  
   const filteredCountries = allCountriesFlat.filter(c => 
     c.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Helper to ensure we can find the country object even if searching by code/name
   const handleSelect = (country) => {
       setCountry(country);
       navigate('home');
@@ -563,9 +667,7 @@ const CountrySelector = ({ setCountry, navigate }) => {
         <button onClick={() => navigate('home')} className="mb-8 flex items-center text-neutral-400 hover:text-white transition-colors group">
           <ArrowRight className="w-4 h-4 rotate-180 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
         </button>
-        
         <h1 className="text-4xl font-bold text-white mb-10">Select Region</h1>
-
         <div className="relative mb-12 group">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-500 group-focus-within:text-white transition-colors" />
           <input 
@@ -576,7 +678,6 @@ const CountrySelector = ({ setCountry, navigate }) => {
             className="w-full pl-12 pr-4 py-4 rounded-xl bg-neutral-900 border border-neutral-800 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none shadow-xl transition-all"
           />
         </div>
-
         {search ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredCountries.map(c => (
@@ -594,7 +695,6 @@ const CountrySelector = ({ setCountry, navigate }) => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {codes.map(code => {
                                 const country = getCountry(code);
-                                // Fallback just in case getCountry returns default for a code that should exist
                                 if (!country) return null;
                                 return (
                                     <button key={code} onClick={() => handleSelect(country)} className="flex items-center p-4 bg-neutral-900/30 rounded-xl border border-neutral-800 hover:border-indigo-500/50 hover:bg-neutral-800 transition-all text-left group">
@@ -613,6 +713,65 @@ const CountrySelector = ({ setCountry, navigate }) => {
   );
 };
 
+const DashboardPreview = ({ t }) => {
+  return (
+    <div className="bg-black py-24 border-t border-neutral-900 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+            Complete visibility. Total control.
+          </h2>
+          <p className="text-xl text-neutral-400">
+            From restaurant tables to gated community access points. Fac Systems unifies your physical and digital operations.
+          </p>
+        </div>
+
+        <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl overflow-hidden ring-1 ring-white/10">
+          <div className="bg-black rounded-2xl overflow-hidden">
+             <div className="border-b border-neutral-800 p-4 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                   <div className="flex space-x-1.5"><div className="w-3 h-3 rounded-full bg-red-500/50"></div><div className="w-3 h-3 rounded-full bg-yellow-500/50"></div><div className="w-3 h-3 rounded-full bg-green-500/50"></div></div>
+                   <div className="h-6 w-px bg-neutral-800 mx-2"></div>
+                   <div className="flex items-center space-x-2 px-3 py-1 bg-neutral-900 rounded-md border border-neutral-800"><Shield className="w-3 h-3 text-green-500" /><span className="text-xs text-neutral-400">fac-secure-v2.1</span></div>
+                </div>
+             </div>
+
+             <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="col-span-1 md:col-span-2 space-y-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
+                         <CreditCard className="w-16 h-16 text-indigo-500 mb-4 opacity-50" />
+                         <p className="text-sm text-neutral-400 font-medium mb-1">POS Revenue</p>
+                         <h3 className="text-3xl font-bold text-white">$84,291.00</h3>
+                      </div>
+                      <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
+                         <Server className="w-16 h-16 text-emerald-500 mb-4 opacity-50" />
+                         <p className="text-sm text-neutral-400 font-medium mb-1">Active Terminals</p>
+                         <h3 className="text-3xl font-bold text-white">142</h3>
+                      </div>
+                   </div>
+                </div>
+                <div className="rounded-2xl bg-indigo-900/10 border border-indigo-500/20 p-6">
+                   <h4 className="text-sm font-bold text-indigo-200 mb-6 flex items-center"><Zap className="w-4 h-4 mr-2 text-indigo-400" /> System Status</h4>
+                   <div className="space-y-6">
+                      {[{ label: "POS Latency", val: "12%", color: "bg-indigo-500" }, { label: "Gate Response", val: "24%", color: "bg-indigo-400" }, { label: "Active Users", val: "84%", color: "bg-indigo-300" }].map((s, i) => (
+                          <div key={i}>
+                             <div className="flex justify-between text-xs text-indigo-300 mb-2"><span>{s.label}</span><span>{s.val}</span></div>
+                             <div className="w-full h-1.5 bg-indigo-900/50 rounded-full overflow-hidden"><div className={`h-full ${s.color} w-[${s.val.replace('%','')}%] rounded-full`}></div></div>
+                          </div>
+                      ))}
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LandingPage = ({ navigate, t, openContact }) => (
   <div className="pt-20 bg-black min-h-screen">
     {/* Hero Section */}
@@ -622,11 +781,10 @@ const LandingPage = ({ navigate, t, openContact }) => (
       <div className="absolute bottom-0 left-1/4 -mb-20 w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32 relative z-10 flex flex-col md:flex-row items-center">
-        
         <div className="w-full md:w-1/2 text-center md:text-left mb-12 md:mb-0">
           <div className="inline-flex items-center space-x-2 bg-neutral-900/80 border border-neutral-800 backdrop-blur rounded-full p-1.5 pl-3 pr-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">{t.hero.new}</span>
-            <span className="text-neutral-300 text-xs font-medium">{t.hero.agency_beta}</span>
+            <span className="bg-pink-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">{t.hero.new}</span>
+            <span className="text-neutral-300 text-xs font-medium">{t.hero.agency_news}</span>
             <ChevronRight className="w-3 h-3 text-neutral-500" />
           </div>
           
@@ -648,12 +806,9 @@ const LandingPage = ({ navigate, t, openContact }) => (
           </div>
         </div>
 
-        {/* 3D Globe Section (Restored) */}
         <div className="w-full md:w-1/2 flex justify-center items-center relative h-[400px] md:h-[500px]">
            <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
            <RotatingGlobe width={500} height={500} />
-           
-           {/* Floating Info Card */}
            <div className="absolute bottom-10 right-0 md:right-10 bg-black/80 backdrop-blur border border-neutral-800 p-4 rounded-xl shadow-2xl animate-in slide-in-from-right duration-1000 delay-500">
               <div className="flex items-center space-x-3 mb-2">
                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -663,7 +818,34 @@ const LandingPage = ({ navigate, t, openContact }) => (
               <p className="text-neutral-500 text-xs mt-1">Latency: 12ms • Uptime: 99.999%</p>
            </div>
         </div>
+      </div>
+    </div>
 
+    {/* Dashboard Preview Section (Restored) */}
+    <DashboardPreview t={t} />
+
+    {/* Bento Grid Features (Restored & Expanded) */}
+    <div className="bg-black py-32 relative border-t border-neutral-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-16 text-center">{t.features.title}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {FEATURES.map((feature, idx) => (
+            <div key={idx} className={`${feature.colSpan} ${feature.bg} rounded-3xl p-8 relative overflow-hidden group hover:border-neutral-600 transition-all duration-300`}>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-white">{feature.title}</h3>
+                <p className={`text-lg leading-relaxed ${feature.isCiro ? 'text-pink-200' : 'text-neutral-400'}`}>
+                  {feature.desc}
+                </p>
+                {feature.isCiro && (
+                   <div className="mt-8 inline-block bg-white text-black text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider">Coming Soon</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
 
@@ -679,7 +861,7 @@ const LandingPage = ({ navigate, t, openContact }) => (
             {t.agency.desc}
           </p>
         </div>
-        <button onClick={openContact} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/25">
+        <button onClick={() => navigate('agency')} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/25">
           {t.agency.btn}
         </button>
       </div>
@@ -694,7 +876,6 @@ const App = () => {
   const [country, setCountry] = useState(COUNTRIES[0]); // Default US
   const [isContactOpen, setIsContactOpen] = useState(false);
 
-  // --- Geolocation Logic ---
   useEffect(() => {
     const browserLang = navigator.language.split('-')[0];
     const regionCode = navigator.language.split('-')[1];
@@ -705,7 +886,7 @@ const App = () => {
     if (detectedCountry) setCountry(detectedCountry);
   }, []);
 
-  const t = useMemo(() => TRANSLATIONS['en'], []); // Enforced EN for simplicity
+  const t = useMemo(() => TRANSLATIONS['en'], []); 
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -737,6 +918,7 @@ const App = () => {
                     <li><button onClick={() => setPage('facstore')} className="hover:text-white transition-colors text-left">{t.nav.facstore}</button></li>
                     <li><button onClick={() => setPage('fackitchen')} className="hover:text-white transition-colors text-left">{t.nav.fackitchen}</button></li>
                     <li><button onClick={() => setPage('facaccess')} className="hover:text-white transition-colors text-left">{t.nav.facaccess}</button></li>
+                    <li><button onClick={() => setPage('ciro')} className="hover:text-white transition-colors text-left">{t.nav.ciro}</button></li>
                   </ul>
                 </div>
               </div>
@@ -757,19 +939,14 @@ const App = () => {
             <>
                 <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
                 <ProductPage 
-                    t={t} 
-                    productKey="facstore" 
-                    icon={<ShoppingBag className="w-8 h-8" />} 
-                    graphic={
+                    t={t} productKey="facstore" icon={<ShoppingBag className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
                             <div className="relative">
                                 <AnimatedReceipt />
                                 <div className="absolute -bottom-4 -right-4 bg-green-500 text-black text-xs font-bold px-2 py-1 rounded shadow-lg animate-bounce">Paid</div>
                             </div>
                         </div>
-                    }
-                    accentColor="indigo"
-                    openContact={toggleContact}
+                    } accentColor="indigo" openContact={toggleContact}
                 />
             </>
         );
@@ -778,19 +955,14 @@ const App = () => {
             <>
                 <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
                 <ProductPage 
-                    t={t} 
-                    productKey="fackitchen" 
-                    icon={<Utensils className="w-8 h-8" />} 
-                    graphic={
+                    t={t} productKey="fackitchen" icon={<Utensils className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
                             <div className="w-full max-w-md">
                                 <div className="flex justify-between text-neutral-500 text-xs mb-2 font-mono"><span>KDS-01</span><span>LIVE</span></div>
                                 <AnimatedKitchen />
                             </div>
                         </div>
-                    }
-                    accentColor="orange"
-                    openContact={toggleContact}
+                    } accentColor="orange" openContact={toggleContact}
                 />
             </>
         );
@@ -799,18 +971,33 @@ const App = () => {
             <>
                 <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
                 <ProductPage 
-                    t={t} 
-                    productKey="facaccess" 
-                    icon={<Key className="w-8 h-8" />} 
-                    graphic={
+                    t={t} productKey="facaccess" icon={<Key className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
-                            <div className="w-full max-w-sm">
-                                <AnimatedGate />
-                            </div>
+                            <div className="w-full max-w-sm"><AnimatedGate /></div>
                         </div>
-                    }
-                    accentColor="emerald"
-                    openContact={toggleContact}
+                    } accentColor="emerald" openContact={toggleContact}
+                />
+            </>
+        );
+      case 'ciro':
+        return (
+            <>
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <ProductPage 
+                    t={t} isCiro icon={<Users className="w-8 h-8" />} graphic={
+                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedCiro /></div>
+                    } accentColor="pink" openContact={toggleContact}
+                />
+            </>
+        );
+      case 'agency':
+        return (
+            <>
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <ProductPage 
+                    t={t} isAgency icon={<Code className="w-8 h-8" />} graphic={
+                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedAgency /></div>
+                    } accentColor="indigo" openContact={toggleContact}
                 />
             </>
         );
