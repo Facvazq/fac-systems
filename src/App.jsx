@@ -5,17 +5,45 @@ import {
   CreditCard, Server, Activity, ShoppingBag, Key, Utensils, 
   ScanBarcode, Printer, Receipt, Users, Clock, AlertTriangle, 
   Smartphone, MapPin, CheckCircle2, XCircle, Copy, Mail,
-  Layout, Code, Palette, Kanban, UserPlus, Filter
+  Layout, Code, Palette, Kanban, UserPlus, Filter, Layers, 
+  Cpu, Database, Share2, Command, Folder
 } from 'lucide-react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  updateProfile,
+  signInWithCustomToken,
+  signInAnonymously
+} from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB0IzlOx2smFfr2TaBTVGM4T7oY-HIMQ7c",
+  authDomain: "facsystems-7f0c9.firebaseapp.com",
+  projectId: "facsystems-7f0c9",
+  storageBucket: "facsystems-7f0c9.firebasestorage.app",
+  messagingSenderId: "663760788312",
+  appId: "1:663760788312:web:1211cadaf05058ea73e32d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // --- Assets & Data ---
 
-const CONTACT_EMAIL = "Facsystemshome@gmail.com";
+const CONTACT_EMAIL = "facsystemshome@gmail.com";
 
 const REGIONS = {
   "North America": ['US', 'CA'],
   "South America": ['AR'],
   "Europe": ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'SE', 'CH', 'PL', 'BE', 'AT', 'PT', 'GR', 'IE', 'NO', 'DK', 'FI', 'CZ', 'HU', 'RO', 'UA', 'HR', 'BG', 'SK', 'SI', 'LU', 'IS', 'EE', 'LV', 'LT', 'MT', 'CY', 'MC'],
+  "Middle East & Africa": ['AE', 'EG', 'QA'],
   "Oceania": ['AU']
 };
 
@@ -29,6 +57,11 @@ const COUNTRIES = [
   
   // Oceania
   { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: '$', rate: 1.5, bundle: 38 },
+
+  // Middle East & Africa
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', currency: 'AED', symbol: 'Dh', rate: 3.67, bundle: 95 },
+  { code: 'EG', name: 'Egypt', flag: '🇪🇬', currency: 'EGP', symbol: 'E£', rate: 48, bundle: 1200 },
+  { code: 'QA', name: 'Qatar', flag: '🇶🇦', currency: 'QAR', symbol: 'QR', rate: 3.64, bundle: 95 },
   
   // Europe
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£', rate: 0.8, bundle: 20 },
@@ -70,44 +103,24 @@ const getCountry = (code) => COUNTRIES.find(c => c.code === code) || { ...COUNTR
 
 const TRANSLATIONS = {
   en: {
-    nav: { facstore: "FacStore OS", fackitchen: "FacKitchen", facaccess: "FacAccess", ciro: "Ciro", pricing: "Pricing", agency: "Fac Agency" },
-    hero: { new: "New", agency_news: "Ciro CRM is coming soon", title_start: "Software that", title_end: "means business.", subtitle: "The unified operating system for enterprise. Manage restaurant POS, retail inventory, and secure entry systems in one ecosystem.", contact_btn: "Explore Solutions" },
+    nav: { trayo: "Trayo", agency: "Fac Agency" },
+    hero: { new: "New", agency_news: "Trayo for Mac is now available", title_start: "The Software that", title_end: "Works with you.", subtitle: "Fac Systems builds intelligent tools that adapt to your workflow. From instant file access to bespoke digital products, we design for speed and simplicity.", contact_btn: "Explore Solutions" },
     agency: { 
         title: "Fac Agency", 
         desc: "We build your digital presence. Fac Agency is our premium web development service dedicated to building high-performance websites and digital products for businesses.", 
         btn: "Join Waitlist",
         status: "Coming Soon"
     },
-    ciro: {
-        title: "Ciro CRM",
-        subtitle: "The All-Free CRM",
-        desc: "Manage customer relationships without the cost. Ciro is our brand new, completely free Customer Relationship Management tool designed to help you track leads, manage pipeline, and close deals faster.",
-        status: "Coming Soon!"
-    },
-    pricing: { title: "Simple, transparent pricing", subtitle: "Choose the software that fits your business needs.", month: "/month", popular: "Most Popular", bundle_title: "Fac Systems One", bundle_desc: "The complete ecosystem. All 3 software suites in one powerful package." },
     globe: { label: "Operating in 35+ Regions" },
-    features: { title: "Built for scale. Designed for speed.", global: "Global Infrastructure", security: "Enterprise Security", analytics: "Real-time Analytics" },
+    features: { title: "One platform. Infinite possibilities.", global: "Global Infrastructure", security: "Enterprise Security", analytics: "Real-time Analytics" },
     products: {
-      facstore: {
-        title: "FacStore OS",
-        subtitle: "Retail Management & POS",
-        desc: "FacStore OS transforms how you run your retail business. From single-location bodegas to multi-chain supermarkets, our platform synchronizes inventory, sales, and employee performance in real-time. Experience a checkout process that is 40% faster than industry standards.",
-        subdesc: "Includes support for barcode scanning, receipt printing, and cash drawer management.",
-        features: ["Live Inventory Sync", "Staff Performance Tracking", "Offline-First Architecture", "Multi-Store Management"]
-      },
-      fackitchen: {
-        title: "FacKitchen",
-        subtitle: "Restaurant & Café POS",
-        desc: "Chaos in the kitchen is a thing of the past. FacKitchen integrates your Front of House POS directly with Kitchen Display Systems (KDS), ensuring orders are routed instantly and accurately. Manage table turnover, split checks effortlessly, and track ingredient usage down to the gram.",
-        subdesc: "Optimized for touchscreens and bump bars in high-heat environments.",
-        features: ["Instant Order Routing", "Ingredient-Level Inventory", "Table & Reservation Map", "Split Check & Tips"]
-      },
-      facaccess: {
-        title: "FacAccess",
-        subtitle: "Secure Entry Control",
-        desc: "Security meets convenience. FacAccess provides a robust on-premise solution for gated communities and corporate facilities. Generate QR guest passes, view live entry logs, and control gates securely. Our system integrates directly with physical barriers and biometric scanners.",
-        subdesc: "Local-first processing ensures zero latency and continued operation without internet.",
-        features: ["QR Guest Passes", "License Plate Recognition", "Biometric Integration", "Local-First Security Logs"]
+      trayo: {
+        title: "Trayo",
+        subtitle: "Instant File Access",
+        desc: "Trayo is a lightweight macOS menu bar app that gives you instant access to your files without cluttering your Dock or desktop. It lives quietly in the system tray, letting you open folders, preview files, and jump to what you need with a single click or keyboard shortcut. Designed to be fast, minimal, and distraction-free, Trayo keeps your workflow smooth while staying out of the way.",
+        subdesc: "Available for macOS Sonoma and later. Apple Silicon native.",
+        btn: "Download for Mac",
+        features: ["Menu Bar Integration", "Instant Folder Preview", "One-Click File Jump", "Keyboard Shortcuts"]
       }
     }
   }
@@ -139,15 +152,23 @@ const FEATURES = [
     bg: "bg-indigo-900/20 border border-indigo-500/30"
   },
   {
-    key: "ciro_feat",
-    title: "Ciro CRM",
-    desc: "Our upcoming 100% Free CRM for growth.",
-    icon: <Users className="w-6 h-6 text-white" />,
+    key: "trayo_feat",
+    title: "Trayo",
+    desc: "The minimal file manager for macOS.",
+    icon: <Layers className="w-6 h-6 text-white" />,
     colSpan: "col-span-12 md:col-span-8",
-    bg: "bg-gradient-to-r from-pink-900 to-rose-900 border border-pink-700",
-    isCiro: true
+    bg: "bg-gradient-to-r from-blue-900 to-indigo-900 border border-indigo-700",
+    isTrayo: true
   }
 ];
+
+// --- Custom Icons ---
+
+const AppleLogo = ({ className }) => (
+  <svg viewBox="0 0 384 512" fill="currentColor" className={className}>
+    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z"/>
+  </svg>
+);
 
 // --- Animations & Graphics ---
 
@@ -224,97 +245,40 @@ const RotatingGlobe = ({ width = 400, height = 400 }) => {
   return <canvas ref={canvasRef} width={width} height={height} className="max-w-full" />;
 };
 
-const AnimatedReceipt = () => (
-  <div className="w-48 bg-white text-black p-4 rounded shadow-xl mx-auto font-mono text-[10px] transform transition-all duration-1000 hover:scale-105">
-    <div className="text-center mb-4">
-      <div className="font-bold text-lg">FacStore</div>
-      <div className="text-neutral-400">Transaction #8492</div>
-    </div>
-    <div className="space-y-2 border-b border-dashed border-neutral-300 pb-4 mb-4">
-      <div className="flex justify-between"><span>Milk (1gal)</span><span>$4.50</span></div>
-      <div className="flex justify-between"><span>Eggs (12ct)</span><span>$3.20</span></div>
-      <div className="flex justify-between"><span>Bread</span><span>$2.80</span></div>
-    </div>
-    <div className="flex justify-between font-bold text-sm">
-      <span>TOTAL</span>
-      <span>$10.50</span>
-    </div>
-    <div className="mt-6 text-center text-neutral-400">Thank you for shopping!</div>
-    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent h-4 w-full animate-[scan_2s_linear_infinite]"></div>
-  </div>
-);
-
-const AnimatedKitchen = () => {
-  const [tickets, setTickets] = useState([1, 2, 3]);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTickets(prev => {
-        const next = [...prev];
-        next.shift();
-        next.push(prev[prev.length - 1] + 1);
-        return next;
-      });
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex space-x-2 overflow-hidden px-4">
-      {tickets.map(t => (
-        <div key={t} className="min-w-[120px] bg-neutral-800 border-t-4 border-orange-500 p-2 rounded animate-in slide-in-from-right duration-500">
-          <div className="text-orange-500 font-bold text-xs mb-1">ORDER #{t + 40}</div>
-          <div className="text-white text-[10px] space-y-1">
-            <div className="flex items-center"><CheckCircle2 className="w-3 h-3 mr-1 text-green-500"/> Burger</div>
-            <div className="flex items-center"><Clock className="w-3 h-3 mr-1 text-yellow-500"/> Fries</div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const AnimatedGate = () => {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    const interval = setInterval(() => setOpen(p => !p), 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="relative w-full h-32 bg-neutral-900 rounded-lg flex items-center justify-center overflow-hidden border border-neutral-800">
-      <div className="absolute bottom-0 w-full h-1 bg-neutral-700"></div>
-      <div className={`absolute bottom-4 left-10 w-2 h-16 bg-neutral-600 rounded-t origin-bottom transition-all duration-1000 ${open ? 'rotate-[-45deg]' : 'rotate-0'}`}></div>
-      <div className={`absolute bottom-4 left-12 w-48 h-2 bg-red-500 origin-left transition-all duration-1000 ${open ? 'rotate-[-45deg]' : 'rotate-0'}`}>
-         <div className="w-full h-full flex justify-between px-2">
-            <div className="w-4 h-full bg-white/50"></div>
-            <div className="w-4 h-full bg-white/50"></div>
-            <div className="w-4 h-full bg-white/50"></div>
-         </div>
-      </div>
-      <div className={`absolute top-4 right-4 px-2 py-1 rounded text-[10px] font-bold ${open ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-        {open ? 'ACCESS GRANTED' : 'LOCKED'}
-      </div>
-    </div>
-  );
-};
-
-const AnimatedCiro = () => (
-    <div className="w-full h-full bg-neutral-900 rounded-xl p-4 flex gap-4 overflow-hidden border border-neutral-800">
-        {[
-            { title: "LEADS", color: "bg-pink-500", items: 2 },
-            { title: "CONTACTED", color: "bg-purple-500", items: 1 },
-            { title: "WON", color: "bg-green-500", items: 3 }
-        ].map((col, i) => (
-            <div key={i} className="flex-1 bg-neutral-800/50 rounded-lg p-2 flex flex-col gap-2">
-                <div className={`text-[10px] font-bold ${col.color.replace('bg-', 'text-')} mb-1 uppercase`}>{col.title}</div>
-                {Array.from({length: col.items}).map((_, j) => (
-                    <div key={j} className="bg-neutral-700 p-2 rounded shadow-sm hover:scale-105 transition-transform cursor-pointer">
-                        <div className="w-8 h-2 bg-neutral-600 rounded mb-1"></div>
-                        <div className="w-full h-1.5 bg-neutral-600/50 rounded"></div>
-                    </div>
-                ))}
+const AnimatedTrayo = () => (
+    <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex flex-col items-center justify-center border border-neutral-800 relative overflow-hidden">
+        {/* MacOS Menu Bar Mock */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-neutral-800/80 rounded-lg flex items-center justify-end px-3 space-x-3 border border-neutral-700 backdrop-blur-sm">
+            <div className="text-white text-[10px]">9:41 AM</div>
+            <Search className="w-3 h-3 text-white" />
+            <div className="w-4 h-4 bg-indigo-500 rounded-sm flex items-center justify-center animate-pulse">
+                <Layers className="w-3 h-3 text-white" />
             </div>
-        ))}
+        </div>
+        
+        {/* Trayo Dropdown Mock */}
+        <div className="mt-16 w-64 bg-neutral-800/90 backdrop-blur-md rounded-xl border border-neutral-700 shadow-2xl p-2 animate-in slide-in-from-top-4 duration-700">
+            <div className="px-3 py-2 border-b border-neutral-700 flex justify-between items-center">
+                <span className="text-xs font-bold text-white">Trayo</span>
+                <span className="text-[10px] text-neutral-400">⌘ + ⇧ + Space</span>
+            </div>
+            <div className="p-1 space-y-1 mt-1">
+                <div className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
+                    <Folder className="w-4 h-4 text-blue-400 mr-3" />
+                    <div>
+                        <div className="text-xs text-white group-hover:text-indigo-200">Downloads</div>
+                        <div className="text-[10px] text-neutral-500">2 mins ago</div>
+                    </div>
+                </div>
+                <div className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
+                    <Folder className="w-4 h-4 text-blue-400 mr-3" />
+                    <div>
+                        <div className="text-xs text-white group-hover:text-indigo-200">Documents</div>
+                        <div className="text-[10px] text-neutral-500">Yesterday</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 );
 
@@ -382,9 +346,143 @@ const ContactModal = ({ isOpen, onClose }) => {
   );
 };
 
+// --- Auth Components ---
+
+const AuthLayout = ({ children, title, subtitle, navigate }) => (
+  <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black opacity-50"></div>
+    
+    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10">
+      <button onClick={() => navigate('home')} className="inline-block mb-8 hover:scale-110 transition-transform">
+        <span className="text-4xl font-bold text-white">F.</span>
+      </button>
+      <h2 className="text-3xl font-bold text-white tracking-tight">{title}</h2>
+      <p className="mt-2 text-sm text-neutral-400">{subtitle}</p>
+    </div>
+
+    <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+      <div className="bg-neutral-900/50 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-neutral-800">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const SignIn = ({ navigate }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('home');
+    } catch (err) {
+      setError('Failed to sign in. Check your credentials.');
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <AuthLayout title="Welcome back" subtitle="Sign in to your Fac Systems dashboard" navigate={navigate}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Email address</label>
+          <div className="mt-1">
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Password</label>
+          <div className="mt-1">
+            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
+          </div>
+        </div>
+        <div>
+          <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-black bg-white hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500 transition-all hover:scale-[1.02] disabled:opacity-50">
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </div>
+      </form>
+      <div className="mt-6 text-center">
+        <button onClick={() => navigate('signup')} className="text-sm text-neutral-400 hover:text-white transition-colors">Don't have an account? Sign up</button>
+      </div>
+    </AuthLayout>
+  );
+};
+
+const SignUp = ({ navigate }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [country, setCountry] = useState(COUNTRIES[0].name);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
+      navigate('home');
+    } catch (err) {
+      setError(err.message || 'Failed to create account.');
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <AuthLayout title="Create your account" subtitle="Start building with Fac Systems today" navigate={navigate}>
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Full Name</label>
+          <input required type="text" value={name} onChange={e => setName(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Work Email</label>
+          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Password</label>
+          <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Country/Region</label>
+          <div className="relative mt-1">
+             <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full pl-3 pr-10 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all appearance-none">
+                {COUNTRIES.map(c => (
+                    <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
+                ))}
+             </select>
+             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <ChevronDown className="h-4 w-4 text-neutral-500" />
+             </div>
+          </div>
+        </div>
+        <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg shadow-indigo-900/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:scale-[1.02] disabled:opacity-50">
+          {loading ? 'Creating Account...' : 'Create Account'}
+        </button>
+      </form>
+      <div className="mt-6 text-center">
+        <button onClick={() => navigate('signin')} className="text-sm text-neutral-400 hover:text-white transition-colors">Already have an account? Sign in</button>
+      </div>
+    </AuthLayout>
+  );
+};
+
 // --- Components ---
 
-const Navbar = ({ navigate, currentCountry, t, openContact }) => {
+const Navbar = ({ navigate, currentCountry, t, openContact, user, handleLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -411,11 +509,7 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
             </button>
             
             <div className="hidden lg:flex items-center space-x-1">
-              <button onClick={() => navigate('facstore')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.facstore}</button>
-              <button onClick={() => navigate('fackitchen')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.fackitchen}</button>
-              <button onClick={() => navigate('facaccess')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.facaccess}</button>
-              <button onClick={() => navigate('ciro')} className="px-4 py-2 text-sm font-medium text-pink-400 hover:text-pink-300 transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.ciro}</button>
-              <button onClick={() => navigate('pricing')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.pricing}</button>
+              <button onClick={() => navigate('trayo')} className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800/50">{t.nav.trayo}</button>
               <button onClick={() => navigate('agency')} className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-colors">
                 <span>{t.nav.agency}</span>
               </button>
@@ -432,12 +526,38 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
               <ChevronDown className="w-4 h-4" />
             </button>
             
-            <button 
-              onClick={openContact}
-              className="text-sm font-medium bg-white text-black px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-            >
-              Contact Sales
-            </button>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                 <div className="flex items-center space-x-2 text-white">
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
+                        <User className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium hidden xl:block">{user.displayName || 'User'}</span>
+                 </div>
+                 <button 
+                  onClick={handleLogout}
+                  className="p-2 text-neutral-400 hover:text-white transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <button 
+                  onClick={() => navigate('signin')}
+                  className="text-sm font-medium text-white hover:text-neutral-300 px-4 py-2"
+                >
+                  Log in
+                </button>
+                <button 
+                  onClick={() => navigate('signup')}
+                  className="text-sm font-medium bg-white text-black px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
           </div>
 
           <div className="lg:hidden">
@@ -451,18 +571,21 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
       {isMenuOpen && (
         <div className="lg:hidden absolute top-20 left-0 right-0 bg-neutral-900 border-b border-neutral-800 p-4 shadow-2xl animate-in slide-in-from-top-5 duration-200">
           <div className="flex flex-col space-y-4">
-             <button onClick={() => { navigate('facstore'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.facstore}</button>
-             <button onClick={() => { navigate('fackitchen'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.fackitchen}</button>
-             <button onClick={() => { navigate('facaccess'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.facaccess}</button>
-             <button onClick={() => { navigate('ciro'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-pink-400 hover:bg-neutral-800 rounded-lg">{t.nav.ciro}</button>
-             <button onClick={() => { navigate('agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-indigo-400 hover:bg-neutral-800 rounded-lg">{t.nav.agency}</button>
-             <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.pricing}</button>
+             <button onClick={() => { navigate('trayo'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.trayo}</button>
+             <button onClick={() => { navigate('agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">{t.nav.agency}</button>
             <div className="h-px bg-neutral-800 my-2"></div>
             <button onClick={() => { navigate('country'); setIsMenuOpen(false); }} className="flex items-center space-x-3 p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">
               <span className="text-xl">{currentCountry.flag}</span>
               <span className="font-medium">Change Country ({currentCountry.code})</span>
             </button>
-            <button onClick={openContact} className="text-center font-medium p-3 bg-white text-black rounded-lg">Contact Sales</button>
+            {user ? (
+                 <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="text-center font-medium p-3 text-red-400 bg-neutral-800 rounded-lg">Sign Out</button>
+            ) : (
+                <>
+                    <button onClick={() => { navigate('signin'); setIsMenuOpen(false); }} className="text-center font-medium p-3 text-white bg-neutral-800 rounded-lg">Log in</button>
+                    <button onClick={() => { navigate('signup'); setIsMenuOpen(false); }} className="text-center font-medium p-3 bg-white text-black rounded-lg">Sign up</button>
+                </>
+            )}
           </div>
         </div>
       )}
@@ -470,7 +593,7 @@ const Navbar = ({ navigate, currentCountry, t, openContact }) => {
   );
 };
 
-const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", openContact, isAgency, isCiro }) => {
+const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", openContact, isAgency, isCiro, onDownload }) => {
   let content = {};
   if (isAgency) content = t.agency;
   else if (isCiro) content = t.ciro;
@@ -526,9 +649,16 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
              )}
 
              <div className="flex gap-4">
-                 <button onClick={openContact} className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-colors hover:scale-105 active:scale-95 transform duration-200">
-                    {content.btn || "Book a Demo"}
-                 </button>
+                 {productKey === 'trayo' ? (
+                     <button onClick={onDownload} className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-colors hover:scale-105 active:scale-95 transform duration-200 flex items-center">
+                        <AppleLogo className="w-5 h-5 mr-2" />
+                        {content.btn || "Download"}
+                     </button>
+                 ) : (
+                     <button onClick={openContact} className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-colors hover:scale-105 active:scale-95 transform duration-200">
+                        {content.btn || "Book a Demo"}
+                     </button>
+                 )}
              </div>
           </div>
           
@@ -541,110 +671,6 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
              </div>
           </div>
        </div>
-    </div>
-  );
-};
-
-const PricingPage = ({ t, currentCountry, openContact }) => {
-  let price = 10;
-  let bundlePrice = 25;
-  let currency = 'USD';
-  let symbol = '$';
-
-  const countryConfig = COUNTRIES.find(c => c.code === currentCountry.code);
-  
-  if (countryConfig) {
-      currency = countryConfig.currency;
-      symbol = countryConfig.symbol;
-      
-      if (countryConfig.isSpecial) {
-          price = countryConfig.price;
-          bundlePrice = countryConfig.bundle;
-      } else {
-          price = Math.round(10 * countryConfig.rate);
-          if(countryConfig.bundle) {
-             bundlePrice = countryConfig.bundle; 
-          } else {
-             bundlePrice = Math.round(25 * countryConfig.rate);
-          }
-      }
-  }
-
-  const formatPrice = (val) => val.toLocaleString();
-
-  const plans = [
-    { title: "FacStore OS", icon: <ShoppingBag className="w-6 h-6"/>, color: "indigo" },
-    { title: "FacKitchen", icon: <Utensils className="w-6 h-6"/>, color: "orange" },
-    { title: "FacAccess", icon: <Key className="w-6 h-6"/>, color: "emerald" },
-  ];
-
-  return (
-    <div className="pt-32 pb-24 min-h-screen bg-black text-white relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-900/20 rounded-full blur-[120px] pointer-events-none"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="text-center mb-16">
-                <h1 className="text-5xl font-bold mb-6">{t.pricing.title}</h1>
-                <p className="text-xl text-neutral-400">{t.pricing.subtitle}</p>
-                <div className="mt-4 inline-block px-4 py-2 bg-neutral-900 rounded-full border border-neutral-800 text-lg text-white flex items-center justify-center">
-                    Pricing for <span className="mx-2 text-2xl">{currentCountry.flag}</span> <span className="font-bold">{currentCountry.name}</span> <span className="ml-2 text-neutral-400">({currency})</span>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {plans.map((plan, i) => (
-                    <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 flex flex-col hover:border-neutral-700 transition-colors">
-                        <div className={`w-12 h-12 rounded-xl mb-6 flex items-center justify-center ${plan.color === 'indigo' ? 'bg-indigo-900/50 text-indigo-400' : plan.color === 'orange' ? 'bg-orange-900/50 text-orange-400' : 'bg-emerald-900/50 text-emerald-400'}`}>
-                            {plan.icon}
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">{plan.title}</h3>
-                        <div className="text-3xl font-bold mb-1 flex items-end">
-                            {symbol}{formatPrice(price)}
-                            <span className="text-sm font-normal text-neutral-500 ml-1 mb-1">{currency}{t.pricing.month}</span>
-                        </div>
-                        <p className="text-sm text-neutral-400 mb-8">Full license for single suite.</p>
-                        <ul className="space-y-3 mb-8 flex-1">
-                            <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> Unlimited Users</li>
-                            <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> 24/7 Support</li>
-                            <li className="flex items-center text-sm text-neutral-300"><Check className="w-4 h-4 mr-2 text-neutral-500"/> Analytics</li>
-                        </ul>
-                        <button onClick={openContact} className="w-full py-3 rounded-lg border border-neutral-700 hover:bg-neutral-800 transition-colors font-medium">Contact Sales</button>
-                    </div>
-                ))}
-
-                <div className="bg-white text-black rounded-2xl p-1 relative flex flex-col transform md:scale-105 shadow-2xl">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg border border-neutral-800">
-                        {t.pricing.popular}
-                    </div>
-                    <div className="bg-neutral-100 rounded-xl p-6 flex-1 flex flex-col">
-                        <div className="w-12 h-12 rounded-xl mb-6 flex items-center justify-center bg-black text-white">
-                            <Zap className="w-6 h-6"/>
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">{t.pricing.bundle_title}</h3>
-                        <div className="text-4xl font-bold mb-1 flex items-end">
-                            {symbol}{formatPrice(bundlePrice)}
-                            <span className="text-sm font-normal text-neutral-500 ml-1 mb-1">{currency}{t.pricing.month}</span>
-                        </div>
-                        <p className="text-sm text-neutral-600 mb-8">{t.pricing.bundle_desc}</p>
-                        
-                        <div className="space-y-3 mb-8 flex-1">
-                            <div className="flex items-center space-x-2 p-2 bg-white rounded border border-neutral-200">
-                                <ShoppingBag className="w-4 h-4 text-indigo-600"/> <span className="text-sm font-bold">FacStore OS</span>
-                            </div>
-                            <div className="flex items-center space-x-2 p-2 bg-white rounded border border-neutral-200">
-                                <Utensils className="w-4 h-4 text-orange-600"/> <span className="text-sm font-bold">FacKitchen</span>
-                            </div>
-                            <div className="flex items-center space-x-2 p-2 bg-white rounded border border-neutral-200">
-                                <Key className="w-4 h-4 text-emerald-600"/> <span className="text-sm font-bold">FacAccess</span>
-                            </div>
-                        </div>
-                        <button onClick={openContact} className="w-full py-4 bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors font-bold shadow-lg">
-                            Get the Bundle
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
   );
 };
@@ -713,141 +739,6 @@ const CountrySelector = ({ setCountry, navigate }) => {
   );
 };
 
-const DashboardPreview = ({ t }) => {
-  return (
-    <div className="bg-black py-24 border-t border-neutral-900 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none"></div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Complete visibility. Total control.
-          </h2>
-          <p className="text-xl text-neutral-400">
-            From restaurant tables to gated community access points. Fac Systems unifies your physical and digital operations.
-          </p>
-        </div>
-
-        <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl overflow-hidden ring-1 ring-white/10">
-          <div className="bg-black rounded-2xl overflow-hidden">
-             <div className="border-b border-neutral-800 p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                   <div className="flex space-x-1.5"><div className="w-3 h-3 rounded-full bg-red-500/50"></div><div className="w-3 h-3 rounded-full bg-yellow-500/50"></div><div className="w-3 h-3 rounded-full bg-green-500/50"></div></div>
-                   <div className="h-6 w-px bg-neutral-800 mx-2"></div>
-                   <div className="flex items-center space-x-2 px-3 py-1 bg-neutral-900 rounded-md border border-neutral-800"><Shield className="w-3 h-3 text-green-500" /><span className="text-xs text-neutral-400">fac-secure-v2.1</span></div>
-                </div>
-             </div>
-
-             <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="col-span-1 md:col-span-2 space-y-6">
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
-                         <CreditCard className="w-16 h-16 text-indigo-500 mb-4 opacity-50" />
-                         <p className="text-sm text-neutral-400 font-medium mb-1">POS Revenue</p>
-                         <h3 className="text-3xl font-bold text-white">$84,291.00</h3>
-                      </div>
-                      <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
-                         <Server className="w-16 h-16 text-emerald-500 mb-4 opacity-50" />
-                         <p className="text-sm text-neutral-400 font-medium mb-1">Active Terminals</p>
-                         <h3 className="text-3xl font-bold text-white">142</h3>
-                      </div>
-                   </div>
-                </div>
-                <div className="rounded-2xl bg-indigo-900/10 border border-indigo-500/20 p-6">
-                   <h4 className="text-sm font-bold text-indigo-200 mb-6 flex items-center"><Zap className="w-4 h-4 mr-2 text-indigo-400" /> System Status</h4>
-                   <div className="space-y-6">
-                      {[{ label: "POS Latency", val: "12%", color: "bg-indigo-500" }, { label: "Gate Response", val: "24%", color: "bg-indigo-400" }, { label: "Active Users", val: "84%", color: "bg-indigo-300" }].map((s, i) => (
-                          <div key={i}>
-                             <div className="flex justify-between text-xs text-indigo-300 mb-2"><span>{s.label}</span><span>{s.val}</span></div>
-                             <div className="w-full h-1.5 bg-indigo-900/50 rounded-full overflow-hidden"><div className={`h-full ${s.color} w-[${s.val.replace('%','')}%] rounded-full`}></div></div>
-                          </div>
-                      ))}
-                   </div>
-                </div>
-             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const SolutionsPage = ({ t, navigate }) => {
-  const solutions = [
-    { 
-      id: 'facstore', 
-      title: t.products.facstore.title, 
-      desc: t.products.facstore.desc, 
-      icon: <ShoppingBag className="w-10 h-10 text-indigo-500" />,
-      color: "border-indigo-500/30 hover:border-indigo-500"
-    },
-    { 
-      id: 'fackitchen', 
-      title: t.products.fackitchen.title, 
-      desc: t.products.fackitchen.desc, 
-      icon: <Utensils className="w-10 h-10 text-orange-500" />,
-      color: "border-orange-500/30 hover:border-orange-500"
-    },
-    { 
-      id: 'facaccess', 
-      title: t.products.facaccess.title, 
-      desc: t.products.facaccess.desc, 
-      icon: <Key className="w-10 h-10 text-emerald-500" />,
-      color: "border-emerald-500/30 hover:border-emerald-500"
-    },
-    { 
-      id: 'ciro', 
-      title: t.ciro.title, 
-      desc: t.ciro.desc, 
-      icon: <Users className="w-10 h-10 text-pink-500" />,
-      color: "border-pink-500/30 hover:border-pink-500"
-    },
-    { 
-      id: 'agency', 
-      title: t.agency.title, 
-      desc: t.agency.desc, 
-      icon: <Code className="w-10 h-10 text-indigo-400" />,
-      color: "border-indigo-400/30 hover:border-indigo-400"
-    }
-  ];
-
-  return (
-    <div className="pt-32 pb-24 min-h-screen bg-black text-white relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="text-center mb-20">
-                <h1 className="text-5xl font-bold mb-6">Our Ecosystem</h1>
-                <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
-                    A suite of powerful tools designed to run every aspect of your business.
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {solutions.map((item) => (
-                    <button 
-                        key={item.id} 
-                        onClick={() => navigate(item.id)}
-                        className={`text-left bg-neutral-900/50 border ${item.color} rounded-2xl p-8 transition-all hover:scale-[1.02] hover:bg-neutral-900 group`}
-                    >
-                        <div className="mb-6 bg-neutral-950 w-16 h-16 rounded-xl flex items-center justify-center border border-neutral-800 group-hover:border-neutral-700">
-                            {item.icon}
-                        </div>
-                        <h3 className="text-2xl font-bold mb-3 flex items-center text-white">
-                            {item.title}
-                            <ArrowRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1" />
-                        </h3>
-                        <p className="text-neutral-400 leading-relaxed text-sm">
-                            {item.desc}
-                        </p>
-                    </button>
-                ))}
-            </div>
-        </div>
-    </div>
-  );
-};
-
 const LandingPage = ({ navigate, t, openContact }) => (
   <div className="pt-20 bg-black min-h-screen">
     {/* Hero Section */}
@@ -876,7 +767,7 @@ const LandingPage = ({ navigate, t, openContact }) => (
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-            <button onClick={() => navigate('solutions')} className="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-neutral-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:scale-105">
+            <button onClick={() => navigate('trayo')} className="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-neutral-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:scale-105">
               {t.hero.contact_btn}
             </button>
           </div>
@@ -897,9 +788,6 @@ const LandingPage = ({ navigate, t, openContact }) => (
       </div>
     </div>
 
-    {/* Dashboard Preview Section (Restored) */}
-    <DashboardPreview t={t} />
-
     {/* Bento Grid Features (Restored & Expanded) */}
     <div id="features-grid" className="bg-black py-32 relative border-t border-neutral-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -912,11 +800,11 @@ const LandingPage = ({ navigate, t, openContact }) => (
                   {feature.icon}
                 </div>
                 <h3 className="text-2xl font-bold mb-3 text-white">{feature.title}</h3>
-                <p className={`text-lg leading-relaxed ${feature.isCiro ? 'text-pink-200' : 'text-neutral-400'}`}>
+                <p className={`text-lg leading-relaxed ${feature.isTrayo ? 'text-indigo-200' : 'text-neutral-400'}`}>
                   {feature.desc}
                 </p>
-                {feature.isCiro && (
-                   <div className="mt-8 inline-block bg-white text-black text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider">Coming Soon</div>
+                {feature.isTrayo && (
+                   <div className="mt-8 inline-block bg-white text-black text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider">Enterprise Ready</div>
                 )}
               </div>
             </div>
@@ -951,7 +839,33 @@ const App = () => {
   const [page, setPage] = useState('home');
   const [country, setCountry] = useState(COUNTRIES[0]); // Default US
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
+  // --- Auth Logic ---
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+            await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Auth mismatch, falling back to anonymous", error);
+        await signInAnonymously(auth);
+      }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setPage('home');
+  };
+
+  // --- Geolocation Logic ---
   useEffect(() => {
     const browserLang = navigator.language.split('-')[0];
     const regionCode = navigator.language.split('-')[1];
@@ -970,12 +884,21 @@ const App = () => {
 
   const toggleContact = () => setIsContactOpen(!isContactOpen);
 
+  const handleDownload = () => {
+      const link = document.createElement('a');
+      link.href = '/TrayoInstaller.dmg';
+      link.download = 'TrayoInstaller.dmg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  };
+
   const renderPage = () => {
     switch(page) {
       case 'home':
         return (
           <>
-            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
             <LandingPage navigate={setPage} t={t} openContact={toggleContact} />
             <footer className="bg-black text-white py-16 border-t border-neutral-900">
               <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -991,97 +914,39 @@ const App = () => {
                 <div>
                   <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-neutral-500">Products</h4>
                   <ul className="space-y-3 text-sm text-neutral-400">
-                    <li><button onClick={() => setPage('facstore')} className="hover:text-white transition-colors text-left">{t.nav.facstore}</button></li>
-                    <li><button onClick={() => setPage('fackitchen')} className="hover:text-white transition-colors text-left">{t.nav.fackitchen}</button></li>
-                    <li><button onClick={() => setPage('facaccess')} className="hover:text-white transition-colors text-left">{t.nav.facaccess}</button></li>
-                    <li><button onClick={() => setPage('ciro')} className="hover:text-white transition-colors text-left">{t.nav.ciro}</button></li>
+                    <li><button onClick={() => setPage('trayo')} className="hover:text-white transition-colors text-left">{t.products.trayo.title}</button></li>
                   </ul>
                 </div>
               </div>
             </footer>
           </>
         );
-      case 'pricing':
-        return (
-            <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
-                <PricingPage t={t} currentCountry={country} openContact={toggleContact} />
-            </>
-        );
       case 'country':
         return <CountrySelector setCountry={setCountry} navigate={setPage} />;
-      case 'facstore':
+      case 'signin':
+        return <SignIn navigate={setPage} />;
+      case 'signup':
+        return <SignUp navigate={setPage} />;
+      case 'trayo':
         return (
             <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
                 <ProductPage 
-                    t={t} productKey="facstore" icon={<ShoppingBag className="w-8 h-8" />} graphic={
-                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
-                            <div className="relative">
-                                <AnimatedReceipt />
-                                <div className="absolute -bottom-4 -right-4 bg-green-500 text-black text-xs font-bold px-2 py-1 rounded shadow-lg animate-bounce">Paid</div>
-                            </div>
-                        </div>
-                    } accentColor="indigo" openContact={toggleContact}
-                />
-            </>
-        );
-      case 'fackitchen':
-        return (
-            <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
-                <ProductPage 
-                    t={t} productKey="fackitchen" icon={<Utensils className="w-8 h-8" />} graphic={
-                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
-                            <div className="w-full max-w-md">
-                                <div className="flex justify-between text-neutral-500 text-xs mb-2 font-mono"><span>KDS-01</span><span>LIVE</span></div>
-                                <AnimatedKitchen />
-                            </div>
-                        </div>
-                    } accentColor="orange" openContact={toggleContact}
-                />
-            </>
-        );
-      case 'facaccess':
-        return (
-            <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
-                <ProductPage 
-                    t={t} productKey="facaccess" icon={<Key className="w-8 h-8" />} graphic={
-                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8">
-                            <div className="w-full max-w-sm"><AnimatedGate /></div>
-                        </div>
-                    } accentColor="emerald" openContact={toggleContact}
-                />
-            </>
-        );
-      case 'ciro':
-        return (
-            <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
-                <ProductPage 
-                    t={t} isCiro icon={<Users className="w-8 h-8" />} graphic={
-                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedCiro /></div>
-                    } accentColor="pink" openContact={toggleContact}
+                    t={t} productKey="trayo" icon={<Layers className="w-8 h-8" />} graphic={
+                        <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedTrayo /></div>
+                    } accentColor="indigo" openContact={toggleContact} onDownload={handleDownload}
                 />
             </>
         );
       case 'agency':
         return (
             <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
                 <ProductPage 
                     t={t} isAgency icon={<Code className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedAgency /></div>
                     } accentColor="indigo" openContact={toggleContact}
                 />
-            </>
-        );
-      case 'solutions':
-        return (
-            <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
-                <SolutionsPage t={t} navigate={setPage} />
             </>
         );
       default:
