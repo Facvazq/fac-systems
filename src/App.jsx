@@ -9,6 +9,16 @@ import {
   Cpu, Database, Share2, Command, Folder
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  updateProfile,
+  signInWithCustomToken,
+  signInAnonymously
+} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -22,6 +32,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 // --- Assets & Data ---
@@ -32,60 +43,51 @@ const REGIONS = {
   "North America": ['US', 'CA'],
   "South America": ['AR'],
   "Europe": ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'SE', 'CH', 'PL', 'BE', 'AT', 'PT', 'GR', 'IE', 'NO', 'DK', 'FI', 'CZ', 'HU', 'RO', 'UA', 'HR', 'BG', 'SK', 'SI', 'LU', 'IS', 'EE', 'LV', 'LT', 'MT', 'CY', 'MC'],
-  "Middle East & Africa": ['AE', 'EG', 'QA'],
   "Oceania": ['AU']
 };
 
 const COUNTRIES = [
   // North America
-  { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$', rate: 1, bundle: 25 },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'CAD', symbol: '$', rate: 1.35, bundle: 34 },
-  
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
   // South America
-  { code: 'AR', name: 'Argentina', flag: '🇦🇷', currency: 'ARS', symbol: '$', price: 7000, bundle: 19999, isSpecial: true },
-  
+  { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
   // Oceania
-  { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: '$', rate: 1.5, bundle: 38 },
-
-  // Middle East & Africa
-  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', currency: 'AED', symbol: 'Dh', rate: 3.67, bundle: 95 },
-  { code: 'EG', name: 'Egypt', flag: '🇪🇬', currency: 'EGP', symbol: 'E£', rate: 48, bundle: 1200 },
-  { code: 'QA', name: 'Qatar', flag: '🇶🇦', currency: 'QAR', symbol: 'QR', rate: 3.64, bundle: 95 },
-  
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
   // Europe
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£', rate: 0.8, bundle: 20 },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'FR', name: 'France', flag: '🇫🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'IT', name: 'Italy', flag: '🇮🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'ES', name: 'Spain', flag: '🇪🇸', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'NL', name: 'Netherlands', flag: '🇳🇱', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'SE', name: 'Sweden', flag: '🇸🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'CH', name: 'Switzerland', flag: '🇨🇭', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'PL', name: 'Poland', flag: '🇵🇱', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'BE', name: 'Belgium', flag: '🇧🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'AT', name: 'Austria', flag: '🇦🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'PT', name: 'Portugal', flag: '🇵🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'GR', name: 'Greece', flag: '🇬🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'IE', name: 'Ireland', flag: '🇮🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'NO', name: 'Norway', flag: '🇳🇴', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'DK', name: 'Denmark', flag: '🇩🇰', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'FI', name: 'Finland', flag: '🇫🇮', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'HU', name: 'Hungary', flag: '🇭🇺', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'RO', name: 'Romania', flag: '🇷🇴', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'UA', name: 'Ukraine', flag: '🇺🇦', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'HR', name: 'Croatia', flag: '🇭🇷', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'BG', name: 'Bulgaria', flag: '🇧🇬', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'SK', name: 'Slovakia', flag: '🇸🇰', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'SI', name: 'Slovenia', flag: '🇸🇮', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'LU', name: 'Luxembourg', flag: '🇱🇺', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'IS', name: 'Iceland', flag: '🇮🇸', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'EE', name: 'Estonia', flag: '🇪🇪', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'LV', name: 'Latvia', flag: '🇱🇻', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'LT', name: 'Lithuania', flag: '🇱🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'MT', name: 'Malta', flag: '🇲🇹', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'CY', name: 'Cyprus', flag: '🇨🇾', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
-  { code: 'MC', name: 'Monaco', flag: '🇲🇨', currency: 'EUR', symbol: '€', rate: 0.92, bundle: 23 },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+  { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+  { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+  { code: 'PL', name: 'Poland', flag: '🇵🇱' },
+  { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+  { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+  { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+  { code: 'GR', name: 'Greece', flag: '🇬🇷' },
+  { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
+  { code: 'NO', name: 'Norway', flag: '🇳🇴' },
+  { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
+  { code: 'FI', name: 'Finland', flag: '🇫🇮' },
+  { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
+  { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
+  { code: 'RO', name: 'Romania', flag: '🇷🇴' },
+  { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
+  { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
+  { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
+  { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
+  { code: 'SI', name: 'Slovenia', flag: '🇸🇮' },
+  { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
+  { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
+  { code: 'EE', name: 'Estonia', flag: '🇪🇪' },
+  { code: 'LV', name: 'Latvia', flag: '🇱🇻' },
+  { code: 'LT', name: 'Lithuania', flag: '🇱🇹' },
+  { code: 'MT', name: 'Malta', flag: '🇲🇹' },
+  { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
+  { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
 ];
 
 const getCountry = (code) => COUNTRIES.find(c => c.code === code) || { ...COUNTRIES[0], code, name: code };
@@ -335,9 +337,143 @@ const ContactModal = ({ isOpen, onClose }) => {
   );
 };
 
+// --- Auth Components ---
+
+const AuthLayout = ({ children, title, subtitle, navigate }) => (
+  <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black opacity-50"></div>
+    
+    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10">
+      <button onClick={() => navigate('home')} className="inline-block mb-8 hover:scale-110 transition-transform">
+        <span className="text-4xl font-bold text-white">F.</span>
+      </button>
+      <h2 className="text-3xl font-bold text-white tracking-tight">{title}</h2>
+      <p className="mt-2 text-sm text-neutral-400">{subtitle}</p>
+    </div>
+
+    <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+      <div className="bg-neutral-900/50 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-neutral-800">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const SignIn = ({ navigate }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('home');
+    } catch (err) {
+      setError('Failed to sign in. Check your credentials.');
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <AuthLayout title="Welcome back" subtitle="Sign in to your Fac Systems dashboard" navigate={navigate}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Email address</label>
+          <div className="mt-1">
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Password</label>
+          <div className="mt-1">
+            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
+          </div>
+        </div>
+        <div>
+          <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-black bg-white hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500 transition-all hover:scale-[1.02] disabled:opacity-50">
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </div>
+      </form>
+      <div className="mt-6 text-center">
+        <button onClick={() => navigate('signup')} className="text-sm text-neutral-400 hover:text-white transition-colors">Don't have an account? Sign up</button>
+      </div>
+    </AuthLayout>
+  );
+};
+
+const SignUp = ({ navigate }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [country, setCountry] = useState(COUNTRIES[0].name);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
+      navigate('home');
+    } catch (err) {
+      setError(err.message || 'Failed to create account.');
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <AuthLayout title="Create your account" subtitle="Start building with Fac Systems today" navigate={navigate}>
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Full Name</label>
+          <input required type="text" value={name} onChange={e => setName(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Work Email</label>
+          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Password</label>
+          <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-300">Country/Region</label>
+          <div className="relative mt-1">
+             <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full pl-3 pr-10 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all appearance-none">
+                {COUNTRIES.map(c => (
+                    <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
+                ))}
+             </select>
+             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <ChevronDown className="h-4 w-4 text-neutral-500" />
+             </div>
+          </div>
+        </div>
+        <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg shadow-indigo-900/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:scale-[1.02] disabled:opacity-50">
+          {loading ? 'Creating Account...' : 'Create Account'}
+        </button>
+      </form>
+      <div className="mt-6 text-center">
+        <button onClick={() => navigate('signin')} className="text-sm text-neutral-400 hover:text-white transition-colors">Already have an account? Sign in</button>
+      </div>
+    </AuthLayout>
+  );
+};
+
 // --- Components ---
 
-const Navbar = ({ navigate, currentCountry, t, openContact }) => {
+const Navbar = ({ navigate, currentCountry, t, openContact, user, handleLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -720,6 +856,31 @@ const App = () => {
   const [page, setPage] = useState('home');
   const [country, setCountry] = useState(COUNTRIES[0]); // Default US
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // --- Auth Logic ---
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+            await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Auth mismatch, falling back to anonymous", error);
+        await signInAnonymously(auth);
+      }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setPage('home');
+  };
 
   // --- Geolocation Logic ---
   useEffect(() => {
@@ -754,7 +915,7 @@ const App = () => {
       case 'home':
         return (
           <>
-            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
             <LandingPage navigate={setPage} t={t} openContact={toggleContact} />
             <footer className="bg-black text-white py-16 border-t border-neutral-900">
               <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -779,10 +940,14 @@ const App = () => {
         );
       case 'country':
         return <CountrySelector setCountry={setCountry} navigate={setPage} />;
+      case 'signin':
+        return <SignIn navigate={setPage} />;
+      case 'signup':
+        return <SignUp navigate={setPage} />;
       case 'trayo':
         return (
             <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
                 <ProductPage 
                     t={t} productKey="trayo" icon={<Layers className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedTrayo /></div>
@@ -793,7 +958,7 @@ const App = () => {
       case 'agency':
         return (
             <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
                 <ProductPage 
                     t={t} isAgency icon={<Code className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedAgency /></div>
