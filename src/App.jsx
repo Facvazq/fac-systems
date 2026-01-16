@@ -9,16 +9,6 @@ import {
   Cpu, Database, Share2, Command, Folder
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged,
-  updateProfile,
-  signInWithCustomToken,
-  signInAnonymously
-} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -30,9 +20,8 @@ const firebaseConfig = {
   appId: "1:663760788312:web:1211cadaf05058ea73e32d"
 };
 
-// Initialize Firebase
+// Initialize Firebase (Auth removed to prevent errors)
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
 // --- Assets & Data ---
@@ -337,143 +326,9 @@ const ContactModal = ({ isOpen, onClose }) => {
   );
 };
 
-// --- Auth Components ---
-
-const AuthLayout = ({ children, title, subtitle, navigate }) => (
-  <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black opacity-50"></div>
-    
-    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10">
-      <button onClick={() => navigate('home')} className="inline-block mb-8 hover:scale-110 transition-transform">
-        <span className="text-4xl font-bold text-white">F.</span>
-      </button>
-      <h2 className="text-3xl font-bold text-white tracking-tight">{title}</h2>
-      <p className="mt-2 text-sm text-neutral-400">{subtitle}</p>
-    </div>
-
-    <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-      <div className="bg-neutral-900/50 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-neutral-800">
-        {children}
-      </div>
-    </div>
-  </div>
-);
-
-const SignIn = ({ navigate }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('home');
-    } catch (err) {
-      setError('Failed to sign in. Check your credentials.');
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
-  return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to your Fac Systems dashboard" navigate={navigate}>
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Email address</label>
-          <div className="mt-1">
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Password</label>
-          <div className="mt-1">
-            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
-          </div>
-        </div>
-        <div>
-          <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-black bg-white hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500 transition-all hover:scale-[1.02] disabled:opacity-50">
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </div>
-      </form>
-      <div className="mt-6 text-center">
-        <button onClick={() => navigate('signup')} className="text-sm text-neutral-400 hover:text-white transition-colors">Don't have an account? Sign up</button>
-      </div>
-    </AuthLayout>
-  );
-};
-
-const SignUp = ({ navigate }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [country, setCountry] = useState(COUNTRIES[0].name);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, { displayName: name });
-      navigate('home');
-    } catch (err) {
-      setError(err.message || 'Failed to create account.');
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
-  return (
-    <AuthLayout title="Create your account" subtitle="Start building with Fac Systems today" navigate={navigate}>
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Full Name</label>
-          <input required type="text" value={name} onChange={e => setName(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Work Email</label>
-          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Password</label>
-          <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Country/Region</label>
-          <div className="relative mt-1">
-             <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full pl-3 pr-10 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all appearance-none">
-                {COUNTRIES.map(c => (
-                    <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
-                ))}
-             </select>
-             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <ChevronDown className="h-4 w-4 text-neutral-500" />
-             </div>
-          </div>
-        </div>
-        <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg shadow-indigo-900/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:scale-[1.02] disabled:opacity-50">
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </button>
-      </form>
-      <div className="mt-6 text-center">
-        <button onClick={() => navigate('signin')} className="text-sm text-neutral-400 hover:text-white transition-colors">Already have an account? Sign in</button>
-      </div>
-    </AuthLayout>
-  );
-};
-
 // --- Components ---
 
-const Navbar = ({ navigate, currentCountry, t, openContact, user, handleLogout }) => {
+const Navbar = ({ navigate, currentCountry, t, openContact }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -856,31 +711,6 @@ const App = () => {
   const [page, setPage] = useState('home');
   const [country, setCountry] = useState(COUNTRIES[0]); // Default US
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [user, setUser] = useState(null);
-
-  // --- Auth Logic ---
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-            await signInAnonymously(auth);
-        }
-      } catch (error) {
-        console.error("Auth mismatch, falling back to anonymous", error);
-        await signInAnonymously(auth);
-      }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    setPage('home');
-  };
 
   // --- Geolocation Logic ---
   useEffect(() => {
@@ -915,7 +745,7 @@ const App = () => {
       case 'home':
         return (
           <>
-            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
+            <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
             <LandingPage navigate={setPage} t={t} openContact={toggleContact} />
             <footer className="bg-black text-white py-16 border-t border-neutral-900">
               <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -940,14 +770,10 @@ const App = () => {
         );
       case 'country':
         return <CountrySelector setCountry={setCountry} navigate={setPage} />;
-      case 'signin':
-        return <SignIn navigate={setPage} />;
-      case 'signup':
-        return <SignUp navigate={setPage} />;
       case 'trayo':
         return (
             <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
                 <ProductPage 
                     t={t} productKey="trayo" icon={<Layers className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedTrayo /></div>
@@ -958,7 +784,7 @@ const App = () => {
       case 'agency':
         return (
             <>
-                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} user={user} handleLogout={handleLogout} />
+                <Navbar navigate={setPage} currentCountry={country} t={t} openContact={toggleContact} />
                 <ProductPage 
                     t={t} isAgency icon={<Code className="w-8 h-8" />} graphic={
                         <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-8"><AnimatedAgency /></div>
