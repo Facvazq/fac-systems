@@ -17,7 +17,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home openContact={() => setIsContactOpen(true)} />} />
           <Route path="/trayo" element={<Trayo openContact={() => setIsContactOpen(true)} />} />
-          {/* Add more routes here if needed, e.g. /agency */}
+          {/* You can add an /agency route here later if needed */}
         </Routes>
 
         {/* Footer appears on all pages */}
