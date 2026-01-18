@@ -1,8 +1,48 @@
-import React from 'react';
-import { Layers, Check, ArrowDown, Download, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { Layers, Check, Search, Folder, FileText, Zap, MoreHorizontal, Command } from 'lucide-react';
 import { AppleLogo, AnimatedTrayo } from '../components/Shared';
 
+// Defining TrayoFeatureGraphic locally to prevent import errors if Shared.jsx wasn't updated
+const TrayoFeatureGraphic = () => (
+    <div className="w-full h-full bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent"></div>
+        <div className="p-6 relative z-10 h-full flex flex-col justify-center">
+            {/* Command Bar Card */}
+            <div className="bg-black/80 backdrop-blur-md border border-neutral-700 rounded-xl p-4 mb-4 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
+                <div className="flex items-center space-x-3 mb-3 border-b border-neutral-800 pb-3">
+                    <Command className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs font-mono text-neutral-400">Spotlight Search</span>
+                </div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <FileText className="w-8 h-8 text-blue-400 bg-blue-500/10 p-1.5 rounded-lg" />
+                        <div>
+                            <div className="text-sm font-bold text-white">Q4_Report.pdf</div>
+                            <div className="text-[10px] text-neutral-500">/Documents/Work</div>
+                        </div>
+                    </div>
+                    <div className="text-[10px] bg-neutral-800 px-2 py-1 rounded text-neutral-400">Enter</div>
+                </div>
+            </div>
+
+            {/* Quick Actions Grid */}
+            <div className="grid grid-cols-2 gap-3">
+                <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
+                    <Zap className="w-5 h-5 text-yellow-400 mb-2" />
+                    <span className="text-[10px] text-white">Quick Drop</span>
+                </div>
+                <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
+                    <MoreHorizontal className="w-5 h-5 text-purple-400 mb-2" />
+                    <span className="text-[10px] text-white">Actions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 const Trayo = () => {
+  const [imgError, setImgError] = useState(false);
+
   const handleDownload = () => {
     // Trigger the download
     const link = document.createElement('a');
@@ -33,8 +73,18 @@ const Trayo = () => {
 
        {/* Hero Section */}
        <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col items-center text-center">
-            <div className="w-20 h-20 text-indigo-500 bg-indigo-600/10 rounded-3xl flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(79,70,229,0.3)] animate-in zoom-in duration-700">
-                <Layers className="w-10 h-10" />
+            {/* Trayo Icon */}
+            <div className="w-24 h-24 mb-8 shadow-[0_0_40px_rgba(79,70,229,0.3)] animate-in zoom-in duration-700 rounded-3xl overflow-hidden bg-neutral-900 flex items-center justify-center border border-neutral-800">
+                {!imgError ? (
+                    <img 
+                        src="/trayoicon.png" 
+                        alt="Trayo App Icon" 
+                        className="w-full h-full object-cover"
+                        onError={() => setImgError(true)}
+                    />
+                ) : (
+                    <Layers className="w-12 h-12 text-indigo-500" />
+                )}
             </div>
             
             <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-neutral-500">
@@ -46,7 +96,7 @@ const Trayo = () => {
                 Open files, preview folders, and navigate your system without ever leaving your active window.
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-8">
                  <button 
                     onClick={handleDownload} 
                     className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 transform duration-200 flex items-center shadow-[0_0_20px_rgba(255,255,255,0.2)]"
@@ -55,9 +105,15 @@ const Trayo = () => {
                     Download for Mac
                  </button>
             </div>
-            <p className="mt-4 text-xs text-neutral-600 font-mono uppercase tracking-widest">
-                 macOS 14+ • Apple Silicon Native
-             </p>
+
+            <div className="flex flex-col items-center gap-3">
+                 <p className="text-xs text-neutral-400 font-medium">
+                    Latest update 1.0.2 • Updated Jan 17 2026
+                 </p>
+                 <p className="text-xs text-neutral-600 font-mono uppercase tracking-widest">
+                      macOS 14+ • Apple Silicon Native
+                 </p>
+            </div>
        </div>
 
        {/* Visual Showcase */}
@@ -89,6 +145,13 @@ const Trayo = () => {
                        <p className="text-neutral-400 leading-relaxed">{feat.desc}</p>
                    </div>
                ))}
+               
+               {/* New Feature Graphic Card */}
+               <div className="col-span-1 md:col-span-2 lg:col-span-3 p-1 rounded-2xl bg-gradient-to-r from-neutral-800 to-black border border-neutral-800">
+                    <div className="h-64 rounded-xl overflow-hidden">
+                        <TrayoFeatureGraphic />
+                    </div>
+               </div>
            </div>
        </div>
     </div>
