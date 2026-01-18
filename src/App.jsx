@@ -6,23 +6,8 @@ import {
   ScanBarcode, Printer, Receipt, Users, Clock, AlertTriangle, 
   Smartphone, MapPin, CheckCircle2, XCircle, Copy, Mail,
   Layout, Code, Palette, Kanban, UserPlus, Filter, Layers, 
-  Cpu, Database, Share2, Command, Folder, Music, Image, Video
+  Cpu, Database, Share2, Command, Folder, Music, Image, Video, User, LogOut
 } from 'lucide-react';
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyB0IzlOx2smFfr2TaBTVGM4T7oY-HIMQ7c",
-  authDomain: "facsystems-7f0c9.firebaseapp.com",
-  projectId: "facsystems-7f0c9",
-  storageBucket: "facsystems-7f0c9.firebasestorage.app",
-  messagingSenderId: "663760788312",
-  appId: "1:663760788312:web:1211cadaf05058ea73e32d"
-};
-
-// Initialize Firebase (Auth removed to prevent errors)
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // --- Assets & Data ---
 
@@ -78,6 +63,10 @@ const COUNTRIES = [
   { code: 'MT', name: 'Malta', flag: '🇲🇹' },
   { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
   { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
+  // Middle East
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
+  { code: 'QA', name: 'Qatar', flag: '🇶🇦' },
 ];
 
 const getCountry = (code) => COUNTRIES.find(c => c.code === code) || { ...COUNTRIES[0], code, name: code };
@@ -300,35 +289,6 @@ const AnimatedAgency = () => (
                 <div className="w-2/3 h-full bg-indigo-500 animate-[width_2s_ease-in-out_infinite]"></div>
             </div>
             <div className="text-right text-indigo-500 mt-1">Compiling...</div>
-        </div>
-    </div>
-);
-
-const AnimatedConsumerApp = () => (
-    <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex items-center justify-center border border-neutral-800 relative overflow-hidden">
-        <div className="w-64 bg-neutral-800 rounded-2xl p-4 border border-neutral-700 shadow-2xl">
-             <div className="flex justify-between items-center mb-4">
-                 <h4 className="text-white font-bold">My Cloud</h4>
-                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-             </div>
-             <div className="grid grid-cols-2 gap-2">
-                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
-                     <Image className="w-6 h-6 text-purple-400 mb-2" />
-                     <span className="text-[10px] text-neutral-400">Photos</span>
-                 </div>
-                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
-                     <Music className="w-6 h-6 text-pink-400 mb-2" />
-                     <span className="text-[10px] text-neutral-400">Music</span>
-                 </div>
-                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
-                     <Video className="w-6 h-6 text-blue-400 mb-2" />
-                     <span className="text-[10px] text-neutral-400">Video</span>
-                 </div>
-                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
-                     <Folder className="w-6 h-6 text-yellow-400 mb-2" />
-                     <span className="text-[10px] text-neutral-400">Files</span>
-                 </div>
-             </div>
         </div>
     </div>
 );
@@ -822,21 +782,12 @@ const App = () => {
   const toggleContact = () => setIsContactOpen(!isContactOpen);
 
   const handleDownload = () => {
-      // In a real deployment, you would upload "TrayoInstaller.dmg" to your "public" folder.
-      // Since that file doesn't exist in this demo environment, we'll download a placeholder text file
-      // to prevent the "File not found" error.
-      const textContent = "Thank you for downloading Trayo!\n\nThis is a placeholder file because the actual 'TrayoInstaller.dmg' has not been uploaded to the website's public folder yet.\n\nTo fix this in production:\n1. Place your 'TrayoInstaller.dmg' file in the 'public' folder of your React project.\n2. Update the handleDownload function in App.jsx to point to '/TrayoInstaller.dmg'.";
-      
-      const blob = new Blob([textContent], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      
       const link = document.createElement('a');
-      link.href = url;
-      link.download = 'Trayo_Download_Info.txt'; // downloading a txt instead of failing on dmg
+      link.href = '/TrayoInstaller.dmg';
+      link.download = 'TrayoInstaller.dmg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
   };
 
   const renderPage = () => {
