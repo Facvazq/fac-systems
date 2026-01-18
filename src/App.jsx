@@ -6,34 +6,8 @@ import {
   ScanBarcode, Printer, Receipt, Users, Clock, AlertTriangle, 
   Smartphone, MapPin, CheckCircle2, XCircle, Copy, Mail,
   Layout, Code, Palette, Kanban, UserPlus, Filter, Layers, 
-  Cpu, Database, Share2, Command, Folder
+  Cpu, Database, Share2, Command, Folder, Music, Image, Video
 } from 'lucide-react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged,
-  updateProfile,
-  signInWithCustomToken,
-  signInAnonymously
-} from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyB0IzlOx2smFfr2TaBTVGM4T7oY-HIMQ7c",
-  authDomain: "facsystems-7f0c9.firebaseapp.com",
-  projectId: "facsystems-7f0c9",
-  storageBucket: "facsystems-7f0c9.firebasestorage.app",
-  messagingSenderId: "663760788312",
-  appId: "1:663760788312:web:1211cadaf05058ea73e32d"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 // --- Assets & Data ---
 
@@ -43,6 +17,7 @@ const REGIONS = {
   "North America": ['US', 'CA'],
   "South America": ['AR'],
   "Europe": ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'SE', 'CH', 'PL', 'BE', 'AT', 'PT', 'GR', 'IE', 'NO', 'DK', 'FI', 'CZ', 'HU', 'RO', 'UA', 'HR', 'BG', 'SK', 'SI', 'LU', 'IS', 'EE', 'LV', 'LT', 'MT', 'CY', 'MC'],
+  "Middle East & Africa": ['AE', 'EG', 'QA'],
   "Oceania": ['AU']
 };
 
@@ -54,6 +29,10 @@ const COUNTRIES = [
   { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
   // Oceania
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  // Middle East & Africa
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
+  { code: 'QA', name: 'Qatar', flag: '🇶🇦' },
   // Europe
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'DE', name: 'Germany', flag: '🇩🇪' },
@@ -95,7 +74,14 @@ const getCountry = (code) => COUNTRIES.find(c => c.code === code) || { ...COUNTR
 const TRANSLATIONS = {
   en: {
     nav: { trayo: "Trayo", agency: "Fac Agency" },
-    hero: { new: "New", agency_news: "Trayo for Mac is now available", title_start: "The Software that", title_end: "Works with you.", subtitle: "Fac Systems builds intelligent tools that adapt to your workflow. From instant file access to bespoke digital products, we design for speed and simplicity.", contact_btn: "Explore Solutions" },
+    hero: { 
+      new: "New", 
+      agency_news: "Trayo for Mac is available", 
+      title_start: "The Software that", 
+      title_end: "Works with you.", 
+      subtitle: "Powerful tools for everyone. From personal productivity to enterprise management, Fac Systems builds software that adapts to your life and work.", 
+      contact_btn: "Explore Trayo" 
+    },
     agency: { 
         title: "Fac Agency", 
         desc: "We build your digital presence. Fac Agency is our premium web development service dedicated to building high-performance websites and digital products for businesses.", 
@@ -111,7 +97,17 @@ const TRANSLATIONS = {
         desc: "Trayo is a lightweight macOS menu bar app that gives you instant access to your files without cluttering your Dock or desktop. It lives quietly in the system tray, letting you open folders, preview files, and jump to what you need with a single click or keyboard shortcut. Designed to be fast, minimal, and distraction-free, Trayo keeps your workflow smooth while staying out of the way.",
         subdesc: "Available for macOS Sonoma and later. Apple Silicon native.",
         btn: "Download for Mac",
-        features: ["Menu Bar Integration", "Instant Folder Preview", "One-Click File Jump", "Keyboard Shortcuts"]
+        features: [
+            "Menu Bar Integration: Always there, never in the way.",
+            "Instant Previews: Peek into files without opening them.",
+            "Smart Shortcuts: Navigate your system at the speed of thought.",
+            "Privacy First: No cloud syncing, your data stays on your Mac."
+        ],
+        specs: [
+            { label: "Size", value: "12MB" },
+            { label: "Version", value: "1.0.2" },
+            { label: "OS", value: "macOS 14+" }
+        ]
       }
     }
   }
@@ -120,25 +116,25 @@ const TRANSLATIONS = {
 const FEATURES = [
   {
     key: "global",
-    title: "Global Infrastructure",
-    desc: "Deploy instantly across 35+ regions with Fac Systems Cloud.",
+    title: "Global Reach",
+    desc: "Used by creators and companies in 35+ countries.",
     icon: <GlobeIcon className="w-6 h-6 text-white" />,
     colSpan: "col-span-12 md:col-span-8",
     bg: "bg-neutral-900 border border-neutral-800"
   },
   {
-    key: "security",
-    title: "Enterprise Security",
-    desc: "Bank-grade encryption for all data streams.",
-    icon: <Lock className="w-6 h-6 text-white" />,
+    key: "design",
+    title: "Consumer First",
+    desc: "Interfaces designed for humans, not just users.",
+    icon: <Users className="w-6 h-6 text-white" />,
     colSpan: "col-span-12 md:col-span-4",
     bg: "bg-neutral-800 border border-neutral-700"
   },
   {
     key: "analytics",
-    title: "Real-time Analytics",
-    desc: "Monitor performance with millisecond precision.",
-    icon: <BarChart3 className="w-6 h-6 text-white" />,
+    title: "Real-time Sync",
+    desc: "Your data, available the moment you need it.",
+    icon: <Activity className="w-6 h-6 text-white" />,
     colSpan: "col-span-12 md:col-span-4",
     bg: "bg-indigo-900/20 border border-indigo-500/30"
   },
@@ -297,6 +293,35 @@ const AnimatedAgency = () => (
     </div>
 );
 
+const AnimatedConsumerApp = () => (
+    <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex items-center justify-center border border-neutral-800 relative overflow-hidden">
+        <div className="w-64 bg-neutral-800 rounded-2xl p-4 border border-neutral-700 shadow-2xl">
+             <div className="flex justify-between items-center mb-4">
+                 <h4 className="text-white font-bold">My Cloud</h4>
+                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+             </div>
+             <div className="grid grid-cols-2 gap-2">
+                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
+                     <Image className="w-6 h-6 text-purple-400 mb-2" />
+                     <span className="text-[10px] text-neutral-400">Photos</span>
+                 </div>
+                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
+                     <Music className="w-6 h-6 text-pink-400 mb-2" />
+                     <span className="text-[10px] text-neutral-400">Music</span>
+                 </div>
+                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
+                     <Video className="w-6 h-6 text-blue-400 mb-2" />
+                     <span className="text-[10px] text-neutral-400">Video</span>
+                 </div>
+                 <div className="bg-neutral-700/50 p-3 rounded-lg flex flex-col items-center justify-center aspect-square">
+                     <Folder className="w-6 h-6 text-yellow-400 mb-2" />
+                     <span className="text-[10px] text-neutral-400">Files</span>
+                 </div>
+             </div>
+        </div>
+    </div>
+);
+
 const ContactModal = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
 
@@ -337,143 +362,9 @@ const ContactModal = ({ isOpen, onClose }) => {
   );
 };
 
-// --- Auth Components ---
-
-const AuthLayout = ({ children, title, subtitle, navigate }) => (
-  <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black opacity-50"></div>
-    
-    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10">
-      <button onClick={() => navigate('home')} className="inline-block mb-8 hover:scale-110 transition-transform">
-        <span className="text-4xl font-bold text-white">F.</span>
-      </button>
-      <h2 className="text-3xl font-bold text-white tracking-tight">{title}</h2>
-      <p className="mt-2 text-sm text-neutral-400">{subtitle}</p>
-    </div>
-
-    <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-      <div className="bg-neutral-900/50 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-neutral-800">
-        {children}
-      </div>
-    </div>
-  </div>
-);
-
-const SignIn = ({ navigate }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('home');
-    } catch (err) {
-      setError('Failed to sign in. Check your credentials.');
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
-  return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to your Fac Systems dashboard" navigate={navigate}>
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Email address</label>
-          <div className="mt-1">
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Password</label>
-          <div className="mt-1">
-            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all" />
-          </div>
-        </div>
-        <div>
-          <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-black bg-white hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500 transition-all hover:scale-[1.02] disabled:opacity-50">
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </div>
-      </form>
-      <div className="mt-6 text-center">
-        <button onClick={() => navigate('signup')} className="text-sm text-neutral-400 hover:text-white transition-colors">Don't have an account? Sign up</button>
-      </div>
-    </AuthLayout>
-  );
-};
-
-const SignUp = ({ navigate }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [country, setCountry] = useState(COUNTRIES[0].name);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, { displayName: name });
-      navigate('home');
-    } catch (err) {
-      setError(err.message || 'Failed to create account.');
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
-  return (
-    <AuthLayout title="Create your account" subtitle="Start building with Fac Systems today" navigate={navigate}>
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">{error}</div>}
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Full Name</label>
-          <input required type="text" value={name} onChange={e => setName(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Work Email</label>
-          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Password</label>
-          <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 block w-full px-3 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-300">Country/Region</label>
-          <div className="relative mt-1">
-             <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full pl-3 pr-10 py-3 bg-black border border-neutral-700 rounded-lg text-white focus:ring-white focus:border-white transition-all appearance-none">
-                {COUNTRIES.map(c => (
-                    <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
-                ))}
-             </select>
-             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <ChevronDown className="h-4 w-4 text-neutral-500" />
-             </div>
-          </div>
-        </div>
-        <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg shadow-indigo-900/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:scale-[1.02] disabled:opacity-50">
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </button>
-      </form>
-      <div className="mt-6 text-center">
-        <button onClick={() => navigate('signin')} className="text-sm text-neutral-400 hover:text-white transition-colors">Already have an account? Sign in</button>
-      </div>
-    </AuthLayout>
-  );
-};
-
 // --- Components ---
 
-const Navbar = ({ navigate, currentCountry, t, openContact, user, handleLogout }) => {
+const Navbar = ({ navigate, currentCountry, t, openContact }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -543,14 +434,7 @@ const Navbar = ({ navigate, currentCountry, t, openContact, user, handleLogout }
               <span className="text-xl">{currentCountry.flag}</span>
               <span className="font-medium">Change Country ({currentCountry.code})</span>
             </button>
-            {user ? (
-                 <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="text-center font-medium p-3 text-red-400 bg-neutral-800 rounded-lg">Sign Out</button>
-            ) : (
-                <>
-                    <button onClick={() => { navigate('signin'); setIsMenuOpen(false); }} className="text-center font-medium p-3 text-white bg-neutral-800 rounded-lg">Log in</button>
-                    <button onClick={() => { navigate('signup'); setIsMenuOpen(false); }} className="text-center font-medium p-3 bg-white text-black rounded-lg">Sign up</button>
-                </>
-            )}
+            <button onClick={openContact} className="text-center font-medium p-3 bg-white text-black rounded-lg">Contact Sales</button>
           </div>
         </div>
       )}
@@ -583,7 +467,7 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
              <h4 className={`font-bold uppercase tracking-widest text-sm mb-2 opacity-80 ${accentColor === 'orange' ? 'text-orange-500' : accentColor === 'emerald' ? 'text-emerald-500' : accentColor === 'pink' ? 'text-pink-500' : 'text-indigo-500'}`}>
                 {content.subtitle || "Enterprise Software"}
              </h4>
-             <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">{content.title}</h1>
+             <h1 className={`text-5xl md:text-6xl font-bold mb-8 leading-tight ${productKey === 'trayo' ? 'bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500' : ''}`}>{content.title}</h1>
              
              {statusLabel && (
                  <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold mb-8 ${accentColor === 'pink' ? 'bg-pink-500/20 text-pink-400' : 'bg-indigo-500/20 text-indigo-400'}`}>
@@ -600,6 +484,17 @@ const ProductPage = ({ t, productKey, icon, graphic, accentColor = "indigo", ope
                 </p>
              )}
              
+             {content.specs && (
+                 <div className="flex gap-4 mb-8">
+                     {content.specs.map((spec, i) => (
+                         <div key={i} className="bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-lg">
+                             <div className="text-[10px] uppercase text-neutral-500 font-bold">{spec.label}</div>
+                             <div className="text-sm font-bold text-white">{spec.value}</div>
+                         </div>
+                     ))}
+                 </div>
+             )}
+
              {content.features && (
                  <ul className="space-y-4 mb-8">
                      {content.features.map((detail, idx) => (
@@ -712,51 +607,80 @@ const DashboardPreview = ({ t }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Complete visibility. Total control.
+            Designed for You. Built for Business.
           </h2>
           <p className="text-xl text-neutral-400">
-            From restaurant tables to gated community access points. Fac Systems unifies your physical and digital operations.
+            Fac Systems unifies your digital life. Whether you're organizing personal files or managing global logistics.
           </p>
         </div>
 
-        <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl overflow-hidden ring-1 ring-white/10">
-          <div className="bg-black rounded-2xl overflow-hidden">
-             <div className="border-b border-neutral-800 p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                   <div className="flex space-x-1.5"><div className="w-3 h-3 rounded-full bg-red-500/50"></div><div className="w-3 h-3 rounded-full bg-yellow-500/50"></div><div className="w-3 h-3 rounded-full bg-green-500/50"></div></div>
-                   <div className="h-6 w-px bg-neutral-800 mx-2"></div>
-                   <div className="flex items-center space-x-2 px-3 py-1 bg-neutral-900 rounded-md border border-neutral-800"><Shield className="w-3 h-3 text-green-500" /><span className="text-xs text-neutral-400">fac-secure-v2.1</span></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Enterprise View */}
+            <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl overflow-hidden ring-1 ring-white/5 group hover:border-indigo-500/50 transition-all">
+                <div className="bg-black rounded-2xl overflow-hidden h-full flex flex-col">
+                    <div className="border-b border-neutral-800 p-4 flex items-center justify-between">
+                        <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Enterprise Mode</span>
+                        <div className="flex space-x-1.5"><div className="w-2 h-2 rounded-full bg-neutral-700"></div><div className="w-2 h-2 rounded-full bg-neutral-700"></div></div>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col justify-center">
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                             <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700">
+                                <CreditCard className="w-6 h-6 text-indigo-500 mb-2 opacity-50" />
+                                <div className="text-2xl font-bold text-white">$84k</div>
+                                <div className="text-xs text-neutral-500">Revenue</div>
+                             </div>
+                             <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700">
+                                <Activity className="w-6 h-6 text-emerald-500 mb-2 opacity-50" />
+                                <div className="text-2xl font-bold text-white">99.9%</div>
+                                <div className="text-xs text-neutral-500">Uptime</div>
+                             </div>
+                        </div>
+                         <div className="bg-neutral-800/30 p-3 rounded-lg flex items-center space-x-3">
+                           <div className="w-8 h-8 rounded bg-indigo-500/20 flex items-center justify-center text-indigo-500"><ShoppingBag className="w-4 h-4"/></div>
+                           <div className="flex-1">
+                               <div className="text-xs font-bold text-white">Store Sale #991</div>
+                               <div className="text-[10px] text-neutral-500">Just now</div>
+                           </div>
+                           <span className="text-xs text-white font-bold">+$42.50</span>
+                       </div>
+                    </div>
                 </div>
-             </div>
+            </div>
 
-             <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="col-span-1 md:col-span-2 space-y-6">
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
-                         <CreditCard className="w-16 h-16 text-indigo-500 mb-4 opacity-50" />
-                         <p className="text-sm text-neutral-400 font-medium mb-1">POS Revenue</p>
-                         <h3 className="text-3xl font-bold text-white">$84,291.00</h3>
-                      </div>
-                      <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
-                         <Server className="w-16 h-16 text-emerald-500 mb-4 opacity-50" />
-                         <p className="text-sm text-neutral-400 font-medium mb-1">Active Terminals</p>
-                         <h3 className="text-3xl font-bold text-white">142</h3>
-                      </div>
-                   </div>
+            {/* Consumer View */}
+            <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl overflow-hidden ring-1 ring-white/5 group hover:border-pink-500/50 transition-all">
+                <div className="bg-black rounded-2xl overflow-hidden h-full flex flex-col">
+                    <div className="border-b border-neutral-800 p-4 flex items-center justify-between">
+                        <span className="text-xs font-bold text-pink-400 uppercase tracking-wider">Personal Mode</span>
+                        <div className="flex space-x-1.5"><div className="w-2 h-2 rounded-full bg-neutral-700"></div><div className="w-2 h-2 rounded-full bg-neutral-700"></div></div>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col justify-center">
+                        <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700 mb-4 flex items-center space-x-4">
+                            <Music className="w-10 h-10 text-pink-500 bg-pink-500/20 p-2 rounded-lg" />
+                            <div>
+                                <div className="text-white font-bold">Design Flow Playlist</div>
+                                <div className="text-xs text-neutral-500">Updated 2m ago</div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                             <div className="flex items-center justify-between p-3 bg-neutral-800/30 rounded-lg">
+                                 <div className="flex items-center space-x-3">
+                                     <Folder className="w-4 h-4 text-blue-400" />
+                                     <span className="text-sm text-white">Project Assets</span>
+                                 </div>
+                                 <span className="text-xs text-neutral-500">12 items</span>
+                             </div>
+                             <div className="flex items-center justify-between p-3 bg-neutral-800/30 rounded-lg">
+                                 <div className="flex items-center space-x-3">
+                                     <Image className="w-4 h-4 text-purple-400" />
+                                     <span className="text-sm text-white">Vacation.jpg</span>
+                                 </div>
+                                 <span className="text-xs text-neutral-500">4.2 MB</span>
+                             </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="rounded-2xl bg-indigo-900/10 border border-indigo-500/20 p-6">
-                   <h4 className="text-sm font-bold text-indigo-200 mb-6 flex items-center"><Zap className="w-4 h-4 mr-2 text-indigo-400" /> System Status</h4>
-                   <div className="space-y-6">
-                      {[{ label: "POS Latency", val: "12%", color: "bg-indigo-500" }, { label: "Gate Response", val: "24%", color: "bg-indigo-400" }, { label: "Active Users", val: "84%", color: "bg-indigo-300" }].map((s, i) => (
-                          <div key={i}>
-                             <div className="flex justify-between text-xs text-indigo-300 mb-2"><span>{s.label}</span><span>{s.val}</span></div>
-                             <div className="w-full h-1.5 bg-indigo-900/50 rounded-full overflow-hidden"><div className={`h-full ${s.color} w-[${s.val.replace('%','')}%] rounded-full`}></div></div>
-                          </div>
-                      ))}
-                   </div>
-                </div>
-             </div>
-          </div>
+            </div>
         </div>
       </div>
     </div>
@@ -811,6 +735,9 @@ const LandingPage = ({ navigate, t, openContact }) => (
         </div>
       </div>
     </div>
+
+    {/* Dashboard Preview Section (Updated for dual audience) */}
+    <DashboardPreview t={t} />
 
     {/* Bento Grid Features (Restored & Expanded) */}
     <div id="features-grid" className="bg-black py-32 relative border-t border-neutral-900">
@@ -906,7 +833,7 @@ const App = () => {
                     <span className="text-2xl font-bold tracking-tighter">Fac.</span>
                   </div>
                   <p className="text-neutral-500 text-sm leading-relaxed">
-                    Empowering digital enterprises.
+                    Empowering creators and enterprises.
                   </p>
                   <p className="text-neutral-600 text-xs">© 2026 Fac Systems Software Inc.</p>
                 </div>
