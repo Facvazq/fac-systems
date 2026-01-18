@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { 
-  Globe as GlobeIcon, Check, Shield, Zap, BarChart3, 
-  CreditCard, Server, Activity, ShoppingBag, Music, 
-  Folder, Image, ChevronRight, Layers, Users 
+  Globe as GlobeIcon, Activity, Music, 
+  Folder, Image, ChevronRight, Layers, Users,
+  CreditCard, ShoppingBag, Zap, Shield, Server
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -81,7 +81,7 @@ const Home = ({ openContact }) => {
             <p className="max-w-2xl text-xl text-neutral-400 mb-12 leading-relaxed">
               Powerful tools for everyone. From personal productivity to enterprise management, Fac Systems builds software that adapts to your life and work.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
               <button onClick={() => navigate('/trayo')} className="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-neutral-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:scale-105">
                 Explore Trayo
               </button>
@@ -144,6 +144,24 @@ const Home = ({ openContact }) => {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Agency Teaser Banner */}
+      <div className="w-full bg-neutral-900 border-y border-neutral-800 py-16 overflow-hidden relative">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between relative z-10">
+          <div className="mb-6 md:mb-0 text-center md:text-left">
+            <h3 className="text-3xl font-bold mb-3 flex items-center justify-center md:justify-start text-white">
+              <span className="text-indigo-500 mr-3">✦</span> Fac Agency
+            </h3>
+            <p className="text-neutral-400 max-w-lg text-lg">
+              We build your digital presence.
+            </p>
+          </div>
+          <button onClick={() => navigate('/agency')} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/25">
+            Join Waitlist
+          </button>
         </div>
       </div>
     </div>

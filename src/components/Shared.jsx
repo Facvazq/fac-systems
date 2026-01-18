@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Menu, X, ChevronDown, Search, Layers, Folder, 
-  Code, Mail, Check, Copy 
+  Code, Mail, Check, Copy, Zap, MoreHorizontal, FileText,
+  Plane // Added Plane icon for FlightIO
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -39,7 +40,6 @@ export const Navbar = ({ openContact }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Simple country rotation for demo
   const rotateCountry = () => {
     const idx = COUNTRIES.findIndex(c => c.code === currentCountry.code);
     setCurrentCountry(COUNTRIES[(idx + 1) % COUNTRIES.length]);
@@ -67,6 +67,12 @@ export const Navbar = ({ openContact }) => {
                 className={`px-4 py-2 text-sm font-medium transition-colors rounded-full hover:bg-neutral-800/50 ${location.pathname === '/trayo' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}
               >
                 Trayo
+              </button>
+              <button 
+                onClick={() => navigate('/flightio')} 
+                className={`px-4 py-2 text-sm font-medium transition-colors rounded-full hover:bg-neutral-800/50 ${location.pathname === '/flightio' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}
+              >
+                FlightIO
               </button>
               <button className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-colors">
                 <span>Agency</span>
@@ -104,6 +110,7 @@ export const Navbar = ({ openContact }) => {
         <div className="lg:hidden absolute top-20 left-0 right-0 bg-neutral-900 border-b border-neutral-800 p-4 shadow-2xl animate-in slide-in-from-top-5 duration-200">
           <div className="flex flex-col space-y-4">
              <button onClick={() => { navigate('/trayo'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">Trayo</button>
+             <button onClick={() => { navigate('/flightio'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">FlightIO</button>
              <button className="text-left font-medium p-2 text-indigo-400 hover:bg-neutral-800 rounded-lg">Agency</button>
             <div className="h-px bg-neutral-800 my-2"></div>
             <button onClick={openContact} className="text-center font-medium p-3 bg-white text-black rounded-lg">Contact Sales</button>
@@ -132,6 +139,7 @@ export const Footer = ({ openContact }) => {
           <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-neutral-500">Products</h4>
           <ul className="space-y-3 text-sm text-neutral-400">
             <li><button onClick={() => navigate('/trayo')} className="hover:text-white transition-colors text-left">Trayo</button></li>
+            <li><button onClick={() => navigate('/flightio')} className="hover:text-white transition-colors text-left">FlightIO</button></li>
           </ul>
         </div>
         <div>
@@ -192,7 +200,8 @@ export const AppleLogo = ({ className }) => (
 );
 
 export const AnimatedTrayo = () => (
-    <div className="w-full h-full bg-neutral-900 rounded-xl border border-neutral-800 relative overflow-hidden flex flex-col items-center pt-20">
+    <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex flex-col items-center justify-center border border-neutral-800 relative overflow-hidden">
+        {/* MacOS Menu Bar Mock */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 w-3/4 max-w-sm h-8 bg-neutral-800/80 rounded-lg flex items-center justify-end px-3 space-x-3 border border-neutral-700 backdrop-blur-sm z-10">
             <div className="text-white text-[10px]">9:41 AM</div>
             <Search className="w-3 h-3 text-white" />
@@ -200,7 +209,9 @@ export const AnimatedTrayo = () => (
                 <Layers className="w-3 h-3 text-white" />
             </div>
         </div>
-        <div className="w-64 bg-neutral-800/90 backdrop-blur-md rounded-xl border border-neutral-700 shadow-2xl p-2 animate-in slide-in-from-top-4 duration-700 z-0">
+        
+        {/* Trayo Dropdown Mock */}
+        <div className="mt-16 w-64 bg-neutral-800/90 backdrop-blur-md rounded-xl border border-neutral-700 shadow-2xl p-2 animate-in slide-in-from-top-4 duration-700 z-0">
             <div className="px-3 py-2 border-b border-neutral-700 flex justify-between items-center">
                 <span className="text-xs font-bold text-white">Trayo</span>
                 <span className="text-[10px] text-neutral-400">⌘ + ⇧ + Space</span>
@@ -225,6 +236,43 @@ export const AnimatedTrayo = () => (
     </div>
 );
 
+export const TrayoFeatureGraphic = () => (
+    <div className="w-full h-full bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent"></div>
+        <div className="p-6 relative z-10 h-full flex flex-col justify-center">
+            {/* Command Bar Card */}
+            <div className="bg-black/80 backdrop-blur-md border border-neutral-700 rounded-xl p-4 mb-4 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
+                <div className="flex items-center space-x-3 mb-3 border-b border-neutral-800 pb-3">
+                    <Command className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs font-mono text-neutral-400">Spotlight Search</span>
+                </div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <FileText className="w-8 h-8 text-blue-400 bg-blue-500/10 p-1.5 rounded-lg" />
+                        <div>
+                            <div className="text-sm font-bold text-white">Q4_Report.pdf</div>
+                            <div className="text-[10px] text-neutral-500">/Documents/Work</div>
+                        </div>
+                    </div>
+                    <div className="text-[10px] bg-neutral-800 px-2 py-1 rounded text-neutral-400">Enter</div>
+                </div>
+            </div>
+
+            {/* Quick Actions Grid */}
+            <div className="grid grid-cols-2 gap-3">
+                <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
+                    <Zap className="w-5 h-5 text-yellow-400 mb-2" />
+                    <span className="text-[10px] text-white">Quick Drop</span>
+                </div>
+                <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
+                    <MoreHorizontal className="w-5 h-5 text-purple-400 mb-2" />
+                    <span className="text-[10px] text-white">Actions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 export const AnimatedAgency = () => (
     <div className="w-full h-full bg-neutral-950 rounded-xl p-2 border border-neutral-800 flex flex-col font-mono text-[10px]">
         <div className="flex gap-1.5 mb-2 p-2 border-b border-neutral-800">
@@ -238,7 +286,6 @@ export const AnimatedAgency = () => (
             <div className="pl-4 text-white">&lt;h1&gt;Building Your Future&lt;/h1&gt;</div>
             <div className="pl-4 text-neutral-500">&lt;!-- Fac Agency Magic --&gt;</div>
             <div className="pl-2">&lt;/body&gt;</div>
-            <div>&lt;/html&gt;</div>
         </div>
         <div className="mt-auto p-2">
             <div className="w-full h-1 bg-indigo-500/20 rounded-full overflow-hidden">

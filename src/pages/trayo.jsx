@@ -1,11 +1,47 @@
 import React, { useState } from 'react';
 import { Layers, Check, Search, Folder, FileText, Zap, MoreHorizontal, Command } from 'lucide-react';
-import { AppleLogo, AnimatedTrayo } from '../components/Shared';
+import { AppleLogo } from '../components/Shared';
 
-// Defining TrayoFeatureGraphic locally to prevent import errors if Shared.jsx wasn't updated
+// --- Local Components (Self-contained to prevent layout/import bugs) ---
+
+const AnimatedTrayo = () => (
+    <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex flex-col items-center justify-center border border-neutral-800 relative overflow-hidden">
+        {/* Menu Bar Mock */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-3/4 max-w-sm h-8 bg-neutral-800/80 rounded-lg flex items-center justify-end px-3 space-x-3 border border-neutral-700 backdrop-blur-sm z-10">
+            <div className="text-white text-[10px]">9:41 AM</div>
+            <Search className="w-3 h-3 text-white" />
+            <div className="w-4 h-4 bg-indigo-500 rounded-sm flex items-center justify-center animate-pulse">
+                <Layers className="w-3 h-3 text-white" />
+            </div>
+        </div>
+        
+        {/* Dropdown Mock */}
+        <div className="mt-16 w-64 bg-neutral-800/90 backdrop-blur-md rounded-xl border border-neutral-700 shadow-2xl p-2 animate-in slide-in-from-top-4 duration-700 z-0">
+            <div className="px-3 py-2 border-b border-neutral-700 flex justify-between items-center">
+                <span className="text-xs font-bold text-white">Trayo</span>
+                <span className="text-[10px] text-neutral-400">⌘ + ⇧ + Space</span>
+            </div>
+            <div className="p-1 space-y-1 mt-1">
+                {[
+                    { name: 'Downloads', time: '2m ago', color: 'text-blue-400' },
+                    { name: 'Documents', time: '1h ago', color: 'text-purple-400' }
+                ].map((item, i) => (
+                    <div key={i} className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
+                        <Folder className={`w-4 h-4 ${item.color} mr-3`} />
+                        <div>
+                            <div className="text-xs text-white group-hover:text-indigo-200">{item.name}</div>
+                            <div className="text-[10px] text-neutral-500">{item.time}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
+
 const TrayoFeatureGraphic = () => (
     <div className="w-full h-full bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent pointer-events-none"></div>
         <div className="p-6 relative z-10 h-full flex flex-col justify-center">
             {/* Command Bar Card */}
             <div className="bg-black/80 backdrop-blur-md border border-neutral-700 rounded-xl p-4 mb-4 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
@@ -40,6 +76,8 @@ const TrayoFeatureGraphic = () => (
     </div>
 );
 
+// --- Main Page Component ---
+
 const Trayo = () => {
   const [imgError, setImgError] = useState(false);
 
@@ -60,7 +98,7 @@ const Trayo = () => {
   return (
     <div className="bg-black text-white min-h-screen pt-20">
        {/* Sub-navbar for Trayo Product */}
-       <div className="sticky top-20 z-40 bg-neutral-900/80 backdrop-blur-md border-b border-neutral-800">
+       <div className="sticky top-20 z-30 bg-neutral-900/80 backdrop-blur-md border-b border-neutral-800">
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
                <span className="font-bold text-lg tracking-tight text-white">Trayo</span>
                <div className="flex space-x-6 text-xs font-medium">
@@ -72,13 +110,13 @@ const Trayo = () => {
        </div>
 
        {/* Hero Section */}
-       <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col items-center text-center">
+       <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col items-center text-center relative z-10">
             {/* Trayo Icon */}
             <div className="w-24 h-24 mb-8 shadow-[0_0_40px_rgba(79,70,229,0.3)] animate-in zoom-in duration-700 rounded-3xl overflow-hidden bg-neutral-900 flex items-center justify-center border border-neutral-800">
                 {!imgError ? (
                     <img 
                         src="/trayoicon.png" 
-                        alt="Trayo App Icon" 
+                        alt="Trayo" 
                         className="w-full h-full object-cover"
                         onError={() => setImgError(true)}
                     />
@@ -87,7 +125,7 @@ const Trayo = () => {
                 )}
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-neutral-500">
+            <h1 className="text-6xl md:text-8xl font-bold mb-6 pb-4 tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-neutral-500">
                 Trayo
             </h1>
             <p className="text-2xl text-indigo-400 font-medium mb-4">Instant access. Zero clutter.</p>
@@ -117,7 +155,7 @@ const Trayo = () => {
        </div>
 
        {/* Visual Showcase */}
-       <div className="max-w-6xl mx-auto px-4 mb-32">
+       <div className="max-w-6xl mx-auto px-4 mb-32 relative z-10">
            <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-1000"></div>
                 <div className="relative bg-black rounded-3xl border border-neutral-800 shadow-2xl overflow-hidden aspect-video flex items-center justify-center">
@@ -126,8 +164,8 @@ const Trayo = () => {
            </div>
        </div>
 
-       {/* Feature Grid (Overview Information) */}
-       <div className="bg-neutral-900/30 border-t border-neutral-800 py-24">
+       {/* Feature Grid */}
+       <div className="bg-neutral-900/30 border-t border-neutral-800 py-24 relative z-10">
            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {[
                    { title: "Menu Bar Native", desc: "Lives quietly in your menu bar. Always one click away, never in your way." },
@@ -146,9 +184,9 @@ const Trayo = () => {
                    </div>
                ))}
                
-               {/* New Feature Graphic Card */}
+               {/* Feature Graphic Card */}
                <div className="col-span-1 md:col-span-2 lg:col-span-3 p-1 rounded-2xl bg-gradient-to-r from-neutral-800 to-black border border-neutral-800">
-                    <div className="h-64 rounded-xl overflow-hidden">
+                    <div className="h-64 rounded-xl overflow-hidden bg-black">
                         <TrayoFeatureGraphic />
                     </div>
                </div>
