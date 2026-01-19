@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Check, Calendar, Share2, Smartphone, 
-  User, Star, ArrowRight, Layout, Play 
+  User, Star, ArrowRight, Layout, Play, CreditCard 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -131,8 +131,10 @@ const FacAgency = ({ openContact }) => {
       <div className="relative overflow-hidden">
          <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[100px] pointer-events-none"></div>
          <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col items-center text-center relative z-10">
-             
-             {/* Badge removed as requested */}
+             <div className="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-3 py-1 mb-8">
+                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
+                <span className="text-xs font-bold text-indigo-300 uppercase tracking-wide">Agency Coming Soon</span>
+             </div>
 
              <h1 className="text-6xl md:text-8xl font-bold mb-8 tracking-tighter leading-tight">
                  We build your <br/>
@@ -146,13 +148,22 @@ const FacAgency = ({ openContact }) => {
                  We design high-converting websites that make it easy for your clients to discover, trust, and book instantly.
              </p>
 
-             <button 
-                onClick={handleDemo}
-                className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center"
-             >
-                <Play className="w-4 h-4 mr-2 fill-current" />
-                Try our live Demo today
-             </button>
+             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                 <button 
+                    onClick={handleDemo}
+                    className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center"
+                 >
+                    <Play className="w-4 h-4 mr-2 fill-current" />
+                    Try our live Demo today
+                 </button>
+                 <button 
+                    onClick={() => navigate('/agency-plans')}
+                    className="px-8 py-4 bg-neutral-900 border border-neutral-700 text-white font-bold rounded-full hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+                 >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    See Plans
+                 </button>
+             </div>
 
              <div className="mt-12 flex flex-wrap justify-center gap-4 text-xs text-neutral-500 font-mono uppercase tracking-widest">
                  <span>Personal Trainers</span> • <span>Consultants</span> • <span>Barbers</span> • <span>Coaches</span>
@@ -236,16 +247,17 @@ const FacAgency = ({ openContact }) => {
           </div>
       </div>
 
-      {/* CTA */}
+      {/* CTA Footer */}
       <div className="py-24 text-center px-4">
           <h2 className="text-3xl font-bold mb-8">Ready to modernize your service business?</h2>
-          <button 
-            onClick={handleDemo}
-            className="px-10 py-5 bg-white text-black font-bold text-lg rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center mx-auto"
-          >
-            <Play className="w-5 h-5 mr-2 fill-current" />
-            Try our live Demo today
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                 onClick={handleDemo}
+                 className="px-10 py-5 bg-white text-black font-bold text-lg rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-2xl"
+              >
+                Get Started
+              </button>
+          </div>
       </div>
 
     </div>

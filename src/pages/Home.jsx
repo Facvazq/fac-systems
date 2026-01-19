@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { 
   Globe as GlobeIcon, Activity, Music, 
   Folder, Image, ChevronRight, Layers, Users,
-  CreditCard, ShoppingBag
+  CreditCard, ShoppingBag, Zap, Shield, Server,
+  Code, ArrowRight, Check, Plane, X as XIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { AnimatedTrayo } from '../components/Shared';
+import { AnimatedAgency } from '../components/Shared';
 
 const RotatingGlobe = ({ width = 400, height = 400 }) => {
   const canvasRef = useRef(null);
@@ -60,6 +61,128 @@ const FEATURES = [
   { title: "Trayo", desc: "The minimal file manager.", icon: <Layers className="w-6 h-6 text-white" />, colSpan: "md:col-span-8", bg: "bg-gradient-to-r from-blue-900 to-indigo-900 border-indigo-700", isTrayo: true }
 ];
 
+const ServicesTable = ({ navigate }) => {
+  const services = [
+    {
+      title: "Trayo",
+      subtitle: "macOS Utility",
+      price: "Free",
+      period: "forever",
+      desc: "Instant file access from your menu bar. Clean, fast, and native.",
+      features: ["Menu Bar Integration", "No Cloud Sync Required", "Instant Preview", "Drag & Drop"],
+      cta: "Download",
+      action: () => navigate('/trayo'),
+      color: "indigo",
+      customIcon: <img src="/trayoicon.png" alt="Trayo" className="w-full h-full object-cover rounded-md" onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }} />
+    },
+    {
+      title: "FlightIO",
+      subtitle: "iOS App",
+      price: "Free",
+      period: "forever",
+      desc: "Real-time flight tracking without the subscription fees.",
+      features: ["Real-time Updates", "No Hidden Fees", "Offline Mode", "Clean Interface"],
+      cta: "Learn More",
+      action: () => navigate('/flightio'),
+      color: "blue",
+      isConstruction: true,
+      customIcon: <img src="/logo101.png" alt="FlightIO" className="w-full h-full object-cover rounded-md" onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }} />
+    },
+    {
+      title: "Fac Agency",
+      subtitle: "Web Services",
+      price: "From $10", // Updated to reflect pricing model
+      period: "/month",
+      desc: "Premium web development and branding for service professionals.",
+      features: ["Custom Design", "Booking Systems", "SEO Optimization", "Mobile First"],
+      cta: "See Plans", // Updated button text
+      action: () => navigate('/agency-plans'), // Updated link
+      color: "purple",
+      icon: <Code className="w-6 h-6" />
+    }
+  ];
+
+  return (
+    <div className="py-32 border-t border-neutral-900 bg-neutral-950/50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Our Ecosystem</h2>
+          <p className="text-xl text-neutral-400">Tools for creators, travelers, and businesses.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {services.map((service, i) => (
+            <div key={i} className="relative flex flex-col p-8 rounded-3xl border border-neutral-800 bg-black hover:border-neutral-700 transition-colors">
+              {service.isConstruction && (
+                <div className="absolute top-0 right-0 m-4 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full">
+                  <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-wide flex items-center">
+                    <AlertTriangle className="w-3 h-3 mr-1" /> Under Construction
+                  </span>
+                </div>
+              )}
+              
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-${service.color}-500/10 text-${service.color}-500 overflow-hidden`}>
+                {service.customIcon || service.icon}
+              </div>
+
+              <h3 className="text-2xl font-bold text-white mb-1">{service.title}</h3>
+              <p className="text-sm text-neutral-500 mb-6">{service.subtitle}</p>
+
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-white">{service.price}</span>
+                {service.period && <span className="text-neutral-500 text-sm ml-2">{service.period}</span>}
+              </div>
+
+              <p className="text-neutral-400 text-sm leading-relaxed mb-8 flex-grow">
+                {service.desc}
+              </p>
+
+              <ul className="space-y-3 mb-8">
+                {service.features.map((feat, j) => (
+                  <li key={j} className="flex items-center text-sm text-neutral-300">
+                    <Check className={`w-4 h-4 mr-3 text-${service.color}-500`} />
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+
+              <button 
+                onClick={service.action}
+                className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
+                  service.isConstruction 
+                    ? 'bg-neutral-800 text-neutral-400 cursor-not-allowed border border-neutral-700' 
+                    : 'bg-white text-black hover:bg-neutral-200'
+                }`}
+                disabled={service.isConstruction}
+              >
+                {service.isConstruction ? 'Coming Soon' : service.cta}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Simple Alert Icon for the Construction Badge
+const AlertTriangle = ({ className }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+);
+
 const Home = ({ openContact }) => {
   const navigate = useNavigate();
 
@@ -94,6 +217,9 @@ const Home = ({ openContact }) => {
           </div>
         </div>
       </div>
+
+      {/* Services Table */}
+      <ServicesTable navigate={navigate} />
 
       {/* Dashboard Preview */}
       <div className="bg-black py-24 border-t border-neutral-900 relative">
@@ -161,7 +287,7 @@ const Home = ({ openContact }) => {
             </p>
           </div>
           <button onClick={() => navigate('/agency')} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/25">
-            Join Waitlist
+            Try Free Demo
           </button>
         </div>
       </div>

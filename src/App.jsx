@@ -7,6 +7,7 @@ import FlightIO from './pages/FlightIO';
 import CountrySelector from './pages/CountrySelector';
 import FacAgency from './pages/FacAgency';
 import LiveDemoPage from './pages/livedemopage';
+import AgencyPlans from './pages/AgencyPlans'; // Imported new page
 
 const Layout = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -26,6 +27,7 @@ const Layout = () => {
           <Route path="/flightio" element={<FlightIO />} />
           <Route path="/country" element={<CountrySelector setCountry={() => {}} />} />
           <Route path="/agency" element={<FacAgency openContact={() => setIsContactOpen(true)} />} />
+          <Route path="/agency-plans" element={<AgencyPlans openContact={() => setIsContactOpen(true)} />} />
           <Route path="/livedemo" element={<LiveDemoPage />} />
         </Routes>
       </main>
