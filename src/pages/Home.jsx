@@ -2,9 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { 
   Globe as GlobeIcon, Activity, Music, 
   Folder, Image, ChevronRight, Layers, Users,
-  CreditCard, ShoppingBag, Zap, Shield, Server
+  CreditCard, ShoppingBag
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AnimatedTrayo } from '../components/Shared';
 
 const RotatingGlobe = ({ width = 400, height = 400 }) => {
   const canvasRef = useRef(null);
