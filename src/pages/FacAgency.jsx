@@ -4,6 +4,7 @@ import {
   User, Star, ArrowRight, Layout, Play, CreditCard 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { formatPriceFromUsd } from '../utils/currency';
 
 // --- Local Graphics (Self-contained) ---
 
@@ -117,8 +118,9 @@ const SharingGraphic = () => (
 
 // --- Main Component ---
 
-const FacAgency = ({ openContact }) => {
+const FacAgency = ({ openContact, countryCode }) => {
   const navigate = useNavigate();
+  const agencyPrice = formatPriceFromUsd(10, countryCode);
 
   const handleDemo = () => {
     navigate('/livedemo');
@@ -163,6 +165,9 @@ const FacAgency = ({ openContact }) => {
                     <CreditCard className="w-4 h-4 mr-2" />
                     See Plans
                  </button>
+             </div>
+             <div className="mt-4 text-xs uppercase tracking-widest text-neutral-500">
+                Starting at {agencyPrice}/month
              </div>
 
              <div className="mt-12 flex flex-wrap justify-center gap-4 text-xs text-neutral-500 font-mono uppercase tracking-widest">

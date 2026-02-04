@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, X, ChevronDown, Search, Layers, Folder, 
   Code, Mail, Check, Copy, Zap, MoreHorizontal, FileText,
@@ -29,12 +29,16 @@ export const COUNTRIES = [
   { code: 'AE', name: 'UAE', flag: '🇦🇪' },
 ];
 
-export const Navbar = ({ openContact }) => {
+export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [currentCountry, setCurrentCountry] = useState(COUNTRIES[0]);
+  const [localCountry, setLocalCountry] = useState(COUNTRIES[0]);
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const countryMenuRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const activeCountry = currentCountry || localCountry;
+  const setCountry = onCountryChange || setLocalCountry;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -42,9 +46,20 @@ export const Navbar = ({ openContact }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const rotateCountry = () => {
-    const idx = COUNTRIES.findIndex(c => c.code === currentCountry.code);
-    setCurrentCountry(COUNTRIES[(idx + 1) % COUNTRIES.length]);
+  useEffect(() => {
+    const handleClick = (event) => {
+      if (!countryMenuRef.current) return;
+      if (!countryMenuRef.current.contains(event.target)) {
+        setIsCountryOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const handleCountrySelect = (country) => {
+    setCountry(country);
+    setIsCountryOpen(false);
   };
 
   return (
@@ -83,14 +98,41 @@ export const Navbar = ({ openContact }) => {
           </div>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <button 
-              onClick={rotateCountry}
-              className="flex items-center space-x-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors px-3 py-2 rounded-full hover:bg-neutral-800"
-            >
-              <span className="text-lg">{currentCountry.flag}</span>
-              <span className="font-bold">{currentCountry.code}</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
+            <div className="relative" ref={countryMenuRef}>
+              <button 
+                onClick={() => setIsCountryOpen((prev) => !prev)}
+                className="flex items-center space-x-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors px-3 py-2 rounded-full hover:bg-neutral-800"
+                aria-haspopup="listbox"
+                aria-expanded={isCountryOpen}
+              >
+                <span className="text-lg">{activeCountry.flag}</span>
+                <span className="font-bold">{activeCountry.code}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isCountryOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-neutral-800 bg-black/95 backdrop-blur-xl shadow-2xl p-2 z-50">
+                  <div className="text-[10px] uppercase tracking-widest text-neutral-500 px-2 py-1">Region</div>
+                  <div className="mt-1 space-y-1 max-h-64 overflow-auto">
+                    {COUNTRIES.map((country) => (
+                      <button
+                        key={country.code}
+                        onClick={() => handleCountrySelect(country)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors ${
+                          activeCountry.code === country.code
+                            ? 'bg-neutral-800 text-white'
+                            : 'text-neutral-300 hover:bg-neutral-800/70 hover:text-white'
+                        }`}
+                        role="option"
+                        aria-selected={activeCountry.code === country.code}
+                      >
+                        <span className="text-base">{country.flag}</span>
+                        <span className="font-medium">{country.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             
             <button 
               onClick={openContact}

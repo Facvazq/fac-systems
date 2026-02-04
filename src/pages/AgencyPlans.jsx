@@ -1,7 +1,9 @@
 import React from 'react';
 import { Check, Star, Zap, Layout, Palette, Moon } from 'lucide-react';
+import { formatPriceFromUsd } from '../utils/currency';
 
-const AgencyPlans = ({ openContact }) => {
+const AgencyPlans = ({ openContact, countryCode }) => {
+  const agencyPrice = formatPriceFromUsd(10, countryCode);
   return (
     <div className="bg-black text-white min-h-screen pt-32 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -61,7 +63,7 @@ const AgencyPlans = ({ openContact }) => {
                 <div className="bg-black rounded-[1.3rem] p-7 h-full flex flex-col">
                     <div className="mb-6">
                         <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">Fac Agency One</h3>
-                        <div className="text-4xl font-bold text-white">US$ 10<span className="text-sm font-normal text-neutral-500 ml-2">/month</span></div>
+                        <div className="text-4xl font-bold text-white">{agencyPrice}<span className="text-sm font-normal text-neutral-500 ml-2">/month</span></div>
                         <p className="text-sm text-neutral-400 mt-4">For professionals who need more.</p>
                     </div>
 

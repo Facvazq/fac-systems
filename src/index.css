@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,4 +7,48 @@
 /* Smooth scrolling for the whole site */
 html {
   scroll-behavior: smooth;
+}
+
+.font-apple-bold {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+}
+
+@keyframes float-slow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes float-fast {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-16px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.float-fast {
+  animation: float-fast 6s ease-in-out infinite;
+}
+
+.spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+.shimmer-bg {
+  background-size: 200% 200%;
+  animation: shimmer 6s ease infinite;
 }
