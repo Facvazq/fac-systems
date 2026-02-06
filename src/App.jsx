@@ -8,6 +8,8 @@ import CountrySelector from './pages/CountrySelector';
 import FacAgency from './pages/FacAgency';
 import LiveDemoPage from './pages/livedemopage';
 import AgencyPlans from './pages/AgencyPlans'; // Imported new page
+import Panel from './pages/Panel';
+import PanelConfig from './pages/PanelConfig';
 
 const Layout = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -31,6 +33,8 @@ const Layout = () => {
         <Routes>
           <Route path="/" element={<Home openContact={() => setIsContactOpen(true)} countryCode={selectedCountry.code} />} />
           <Route path="/trayo" element={<Trayo />} />
+          <Route path="/panel" element={<Panel />} />
+          <Route path="/panel-config" element={<PanelConfig />} />
           <Route path="/flightio" element={<FlightIO />} />
           <Route path="/country" element={<CountrySelector setCountry={() => {}} />} />
           <Route path="/agency" element={<FacAgency openContact={() => setIsContactOpen(true)} countryCode={selectedCountry.code} />} />

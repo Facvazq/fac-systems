@@ -91,7 +91,13 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
               >
                 FlightIO
               </button>
-              <button onClick={() => navigate('/agency')} className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-colors">
+              <button 
+                onClick={() => navigate('/panel')} 
+                className="px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold uppercase tracking-wider hover:bg-blue-500 transition-colors shadow-[0_0_18px_rgba(37,99,235,0.35)]"
+              >
+                Panel
+              </button>
+              <button onClick={() => navigate('/agency')} className="ml-2 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider hover:bg-emerald-500 transition-colors shadow-[0_0_18px_rgba(16,185,129,0.25)]">
                 <span>Agency</span>
               </button>
             </div>
@@ -155,7 +161,8 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
           <div className="flex flex-col space-y-4">
              <button onClick={() => { navigate('/trayo'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">Trayo</button>
              <button onClick={() => { navigate('/flightio'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">FlightIO</button>
-             <button onClick={() => { navigate('/agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-indigo-400 hover:bg-neutral-800 rounded-lg">Agency</button>
+             <button onClick={() => { navigate('/panel'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-blue-300 hover:bg-neutral-800 rounded-lg">Panel</button>
+             <button onClick={() => { navigate('/agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-emerald-300 hover:bg-neutral-800 rounded-lg">Agency</button>
             <div className="h-px bg-neutral-800 my-2"></div>
             <button onClick={openContact} className="text-center font-medium p-3 bg-white text-black rounded-lg">Contact Sales</button>
           </div>

@@ -1,358 +1,286 @@
-import React, { useEffect, useRef } from 'react';
-import { 
-  Globe as GlobeIcon, Activity, Music, 
-  Folder, Image, ChevronRight, Layers, Users,
-  CreditCard, ShoppingBag, Zap, Shield, Server,
-  Code, ArrowRight, Check, Plane, X as XIcon
+import React from 'react';
+import {
+  Activity, Layers,
+  ChevronRight, Plane,
+  Shield, Code, ArrowRight, TrendingUp, Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { AnimatedAgency } from '../components/Shared';
 import { formatPriceFromUsd } from '../utils/currency';
+import { BackgroundPaths } from '../components/ui/background-paths';
+import { GlowingEffect } from '../components/ui/glowing-effect';
+import { InteractiveHoverButton } from '../components/ui/interactive-hover-button';
+import { RainbowButton } from '../components/ui/rainbow-button';
+import { GradientButton } from '../components/ui/gradient-button';
+import { AnimatedText } from '../components/ui/animated-shiny-text';
+import GlobeFeatureSection from '../components/ui/globe-feature-section';
+import { TestimonialsColumn } from '../components/ui/testimonials-columns';
+import { motion } from 'framer-motion';
 
-const RotatingGlobe = ({ width = 400, height = 400 }) => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let time = 0;
-    const particles = [];
-    const particleCount = 200;
-    const radius = Math.min(width, height) / 2.5;
+// --- Components ---
 
-    for (let i = 0; i < particleCount; i++) {
-      const phi = Math.acos(-1 + (2 * i) / particleCount);
-      const theta = Math.sqrt(particleCount * Math.PI) * phi;
-      particles.push({
-        x: radius * Math.cos(theta) * Math.sin(phi),
-        y: radius * Math.sin(theta) * Math.sin(phi),
-        z: radius * Math.cos(phi)
-      });
-    }
+const GlassCard = ({ children, className = "", hoverEffect = true }) => (
+  <div className={`
+    relative overflow-hidden rounded-3xl 
+    bg-neutral-900/40 backdrop-blur-xl border border-white/10 shadow-lg
+    ${hoverEffect ? 'hover:shadow-xl hover:-translate-y-1 hover:bg-neutral-800/50 transition-all duration-300' : ''}
+    ${className}
+  `}>
+    {children}
+  </div>
+);
 
-    const animate = () => {
-      time += 0.005;
-      ctx.clearRect(0, 0, width, height);
-      ctx.save();
-      ctx.translate(width / 2, height / 2);
-      particles.forEach(p => {
-        const rotX = p.x * Math.cos(time) - p.z * Math.sin(time);
-        const rotZ = p.x * Math.sin(time) + p.z * Math.cos(time);
-        const scale = 250 / (250 - rotZ); 
-        if (scale > 0) {
-          ctx.beginPath();
-          ctx.arc(rotX, p.y, 2 * scale, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, (rotZ + radius) / (2 * radius))})`;
-          ctx.fill();
-        }
-      });
-      ctx.restore();
-      requestAnimationFrame(animate);
-    };
-    const id = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(id);
-  }, [width, height]);
-  return <canvas ref={canvasRef} width={width} height={height} className="max-w-full" />;
-};
+const Badge = ({ children, color = "bg-neutral-800 text-white" }) => (
+  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
+    {children}
+  </span>
+);
 
-const FEATURES = [
-  { title: "Global Reach", desc: "Used by creators in 35+ countries.", icon: <GlobeIcon className="w-6 h-6 text-white" />, colSpan: "md:col-span-7", bg: "bg-neutral-900 border-neutral-800" },
-  { title: "Consumer First", desc: "Interfaces designed for humans.", icon: <Users className="w-6 h-6 text-white" />, colSpan: "md:col-span-5", bg: "bg-neutral-800 border-neutral-700" },
-  { title: "Real-time Sync", desc: "Data available instantly.", icon: <Activity className="w-6 h-6 text-white" />, colSpan: "md:col-span-5", bg: "bg-indigo-900/20 border-indigo-500/30" },
-  { title: "Trayo", desc: "The minimal file manager.", icon: <Layers className="w-6 h-6 text-white" />, colSpan: "md:col-span-7", bg: "bg-gradient-to-br from-blue-900/60 via-indigo-900/70 to-black border-indigo-700" }
+const testimonials = [
+  {
+    text: "This platform revolutionized our operations. The cloud-based tools keep us productive, even remotely.",
+    image: "https://randomuser.me/api/portraits/women/1.jpg",
+    name: "Briana Patton",
+    role: "Operations Manager",
+  },
+  {
+    text: "Implementing this was smooth and quick. The customizable interface made team training effortless.",
+    image: "https://randomuser.me/api/portraits/men/2.jpg",
+    name: "Bilal Ahmed",
+    role: "IT Manager",
+  },
+  {
+    text: "The support team is exceptional, guiding us through setup and providing ongoing assistance.",
+    image: "https://randomuser.me/api/portraits/women/3.jpg",
+    name: "Saman Malik",
+    role: "Customer Support Lead",
+  },
+  {
+    text: "Seamless integration enhanced our business operations. Highly recommend for its intuitive interface.",
+    image: "https://randomuser.me/api/portraits/men/4.jpg",
+    name: "Omar Raza",
+    role: "CEO",
+  },
+  {
+    text: "Robust features and quick support have transformed our workflow, making us significantly more efficient.",
+    image: "https://randomuser.me/api/portraits/women/5.jpg",
+    name: "Zainab Hussain",
+    role: "Project Manager",
+  },
+  {
+    text: "Smooth implementation exceeded expectations. It streamlined processes, improving overall performance.",
+    image: "https://randomuser.me/api/portraits/women/6.jpg",
+    name: "Aliza Khan",
+    role: "Business Analyst",
+  },
 ];
 
-const ServicesTable = ({ navigate, countryCode }) => {
-  const agencyPrice = formatPriceFromUsd(10, countryCode);
-  const services = [
-    {
-      title: "Trayo",
-      subtitle: "macOS Utility",
-      price: "Free",
-      period: "forever",
-      desc: "Instant file access from your menu bar. Clean, fast, and native.",
-      features: ["Menu Bar Integration", "No Cloud Sync Required", "Instant Preview", "Drag & Drop"],
-      cta: "Download",
-      action: () => navigate('/trayo'),
-      accent: "text-indigo-300",
-      glow: "from-indigo-600/30 to-blue-600/20",
-      iconWrap: "bg-indigo-500/15 text-indigo-300",
-      check: "text-indigo-400",
-      customIcon: <img src="/trayoicon.png" alt="Trayo" className="w-full h-full object-cover rounded-md" onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }} />
-    },
-    {
-      title: "FlightIO",
-      subtitle: "iOS App",
-      price: "Free",
-      period: "forever",
-      desc: "Real-time flight tracking without the subscription fees.",
-      features: ["Real-time Updates", "No Hidden Fees", "Offline Mode", "Clean Interface"],
-      cta: "Learn More",
-      action: () => navigate('/flightio'),
-      accent: "text-sky-300",
-      glow: "from-sky-600/25 to-cyan-500/15",
-      iconWrap: "bg-sky-500/15 text-sky-300",
-      check: "text-sky-400",
-      isConstruction: true,
-      customIcon: <img src="/logo101.png" alt="FlightIO" className="w-full h-full object-cover rounded-md" onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }} />
-    },
-    {
-      title: "Fac Agency",
-      subtitle: "Web Services",
-      price: `From ${agencyPrice}`,
-      period: "/month",
-      desc: "Premium web development and branding for service professionals.",
-      features: ["Custom Design", "Booking Systems", "SEO Optimization", "Mobile First"],
-      cta: "See Plans", // Updated button text
-      action: () => navigate('/agency-plans'), // Updated link
-      accent: "text-rose-300",
-      glow: "from-rose-600/25 to-orange-500/15",
-      iconWrap: "bg-rose-500/15 text-rose-300",
-      check: "text-rose-400",
-      icon: <Code className="w-6 h-6" />
-    }
-  ];
-
-  return (
-    <div className="py-28 border-t border-neutral-900 bg-gradient-to-b from-black via-neutral-950 to-black">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">A Focused Ecosystem</h2>
-          <p className="text-lg text-neutral-400 max-w-2xl mx-auto">Three products, one philosophy: software that respects your time.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {services.map((service, i) => (
-            <div key={i} className="relative flex flex-col p-8 rounded-3xl border border-neutral-800 bg-black/80 hover:border-neutral-700 transition-colors overflow-hidden">
-              <div className={`absolute inset-0 opacity-60 bg-gradient-to-br ${service.glow}`} />
-              <div className="absolute -top-10 -right-10 w-24 h-24 border border-white/10 rounded-full spin-slow" />
-              <div className="absolute -bottom-8 left-6 w-16 h-16 border border-white/10 rounded-2xl float-slow" />
-              {service.isConstruction && (
-                <div className="absolute top-0 right-0 m-4 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full">
-                  <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-wide flex items-center">
-                    <AlertTriangle className="w-3 h-3 mr-1" /> Under Construction
-                  </span>
-                </div>
-              )}
-              
-              <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center mb-6 overflow-hidden ${service.iconWrap}`}>
-                {service.customIcon || service.icon}
-              </div>
-
-              <h3 className="text-2xl font-bold text-white mb-1">{service.title}</h3>
-              <p className={`text-sm mb-6 ${service.accent}`}>{service.subtitle}</p>
-
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">{service.price}</span>
-                {service.period && <span className="text-neutral-500 text-sm ml-2">{service.period}</span>}
-              </div>
-
-              <p className="text-neutral-400 text-sm leading-relaxed mb-8 flex-grow">
-                {service.desc}
-              </p>
-
-              <ul className="space-y-3 mb-8">
-                {service.features.map((feat, j) => (
-                  <li key={j} className="flex items-center text-sm text-neutral-300">
-                    <Check className={`w-4 h-4 mr-3 ${service.check}`} />
-                    {feat}
-                  </li>
-                ))}
-              </ul>
-
-              <button 
-                onClick={service.action}
-                className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
-                  service.isConstruction 
-                    ? 'bg-neutral-800 text-neutral-400 cursor-not-allowed border border-neutral-700' 
-                    : 'bg-white text-black hover:bg-neutral-200'
-                }`}
-                disabled={service.isConstruction}
-              >
-                {service.isConstruction ? 'Coming Soon' : service.cta}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Simple Alert Icon for the Construction Badge
-const AlertTriangle = ({ className }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-    <line x1="12" y1="9" x2="12" y2="13"/>
-    <line x1="12" y1="17" x2="12.01" y2="17"/>
-  </svg>
-);
+const firstColumn = testimonials.slice(0, 3);
+const secondColumn = testimonials.slice(3, 6);
 
 const Home = ({ openContact, countryCode }) => {
   const navigate = useNavigate();
+  const agencyPrice = formatPriceFromUsd(10, countryCode);
 
   return (
-    <div className="pt-20 bg-black min-h-screen font-['Sora']">
-      {/* Hero */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute -top-32 -left-32 w-[420px] h-[420px] bg-rose-500/20 rounded-full blur-[120px]" />
-          <div className="absolute top-10 right-1/4 w-[520px] h-[520px] bg-indigo-600/25 rounded-full blur-[140px]" />
-          <div className="absolute -bottom-40 right-0 w-[520px] h-[520px] bg-amber-400/10 rounded-full blur-[160px]" />
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:22px_22px]" />
-          <div className="absolute left-16 top-32 w-24 h-24 border border-white/10 rounded-3xl float-slow" />
-          <div className="absolute right-24 top-20 w-20 h-20 border border-white/10 rounded-full float-fast" />
-          <div className="absolute left-1/3 bottom-16 w-12 h-12 border border-white/10 rounded-xl float-slow" />
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-neutral-900/80 border border-neutral-800 backdrop-blur rounded-full p-1.5 pl-3 pr-4 mb-8">
-                <span className="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">New</span>
-                <span className="text-neutral-300 text-xs font-medium">Trayo for Mac is available</span>
-                <ChevronRight className="w-3 h-3 text-neutral-500" />
-              </div>
-              <h1 className="text-5xl md:text-7xl tracking-tight text-white mb-6 font-apple-bold">
-                Software that feels
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-300 to-white">effortless.</span>
-              </h1>
-              <p className="max-w-2xl text-lg md:text-xl text-neutral-400 mb-10 leading-relaxed">
-                Fac Systems builds products that reduce friction and raise velocity, from personal utilities to polished, revenue-ready web experiences.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-                <button onClick={() => navigate('/trayo')} className="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold text-base rounded-full hover:bg-neutral-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)]">
-                  Explore Trayo
-                </button>
-                <button onClick={() => navigate('/agency-plans')} className="w-full sm:w-auto px-8 py-4 border border-neutral-700 text-white font-bold text-base rounded-full hover:border-neutral-500 hover:bg-white/5 transition-all">
-                  See Agency Plans
-                </button>
-              </div>
-              <div className="mt-10 grid grid-cols-3 gap-6 max-w-md mx-auto lg:mx-0">
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-white">35+</div>
-                  <div className="text-xs uppercase tracking-widest text-neutral-500">Countries</div>
-                </div>
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-white">99.9%</div>
-                  <div className="text-xs uppercase tracking-widest text-neutral-500">Uptime</div>
-                </div>
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-white">3</div>
-                  <div className="text-xs uppercase tracking-widest text-neutral-500">Products</div>
-                </div>
-              </div>
-            </div>
-            <div className="lg:col-span-5 flex justify-center items-center relative h-[360px] md:h-[420px]">
-              <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none" />
-              <div className="absolute -left-4 -top-6 w-28 h-28 rounded-full border border-white/10 spin-slow" />
-              <div className="absolute -right-6 bottom-4 w-20 h-20 rounded-2xl border border-white/10 float-fast" />
-              <div className="absolute right-10 top-10 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest text-neutral-300 float-slow">
-                Live Systems
-              </div>
-              <RotatingGlobe width={480} height={480} />
-            </div>
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-white/20 selection:text-white overflow-x-hidden relative">
+
+      {/* Background Paths Animation */}
+      <BackgroundPaths />
+
+      {/* Hero Section: Split Layout */}
+      <section className="relative px-6 pt-32 pb-20 lg:pt-48 lg:pb-32 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center z-10">
+
+        {/* Left: Content & Form */}
+        <div className="flex flex-col items-start space-y-8 animate-fade-up">
+          <div className="inline-flex items-center space-x-2 bg-neutral-900/60 backdrop-blur-md border border-neutral-800 rounded-full py-1.5 px-4 shadow-sm">
+            <span className="flex h-2 w-2 rounded-full bg-cta animate-pulse bg-yellow-500"></span>
+            <span className="text-sm font-medium text-neutral-400">v3.0 is now live</span>
+          </div>
+
+          <div className="text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1]">
+            Software that <br />
+            <AnimatedText
+              text="feels effortless."
+              textClassName="text-5xl lg:text-7xl font-bold p-0 text-left"
+              className="justify-start py-0 block"
+            />
+          </div>
+
+          <p className="text-xl text-neutral-400 max-w-lg leading-relaxed">
+            Fac Systems builds premium digital infrastructure for creators and service professionals. Frictionless, beautiful, and secure.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md items-center">
+            <RainbowButton onClick={() => navigate('/agency-plans')} className="h-12 w-48 text-base shadow-lg shadow-yellow-500/20">
+              Start Building
+            </RainbowButton>
+            <button onClick={() => navigate('/trayo')} className="px-6 py-2 text-neutral-400 hover:text-white font-medium transition-colors">
+              Explore Trayo
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Services Table */}
-      <ServicesTable navigate={navigate} countryCode={countryCode} />
+        {/* Right: Visual / Dashboard Mockup */}
+        <div className="relative animate-fade-up [animation-delay:200ms]">
+          <div className="relative z-10">
+            <GlassCard className="p-6 md:p-8 !bg-black/60 border-neutral-800">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-lg font-bold text-white">Live Dashboard</h3>
+                  <p className="text-sm text-neutral-500">Real-time performance metrics</p>
+                </div>
+                <Activity className="w-5 h-5 text-yellow-500" />
+              </div>
 
-      {/* Dashboard Preview */}
-      <div className="bg-black py-24 border-t border-neutral-900 relative">
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:18px_18px]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl text-white mb-6 font-apple-bold">Designed for Humans. Built for Growth.</h2>
-            <p className="text-lg text-neutral-400">Clarity in the interface, momentum in the workflow.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Enterprise Card */}
-              <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl ring-1 ring-white/5 hover:border-indigo-500/50 transition-all relative overflow-hidden">
-                  <div className="absolute -top-8 -right-8 w-24 h-24 border border-white/10 rounded-full spin-slow" />
-                  <div className="bg-black rounded-2xl overflow-hidden h-full flex flex-col p-6">
-                      <div className="border-b border-neutral-800 pb-4 mb-4 flex justify-between"><span className="text-xs font-bold text-indigo-400 uppercase">Enterprise Mode</span></div>
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                           <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700"><CreditCard className="w-6 h-6 text-indigo-500 mb-2"/><div className="text-2xl font-bold text-white">$84k</div><div className="text-xs text-neutral-500">Revenue</div></div>
-                           <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700"><Activity className="w-6 h-6 text-emerald-500 mb-2"/><div className="text-2xl font-bold text-white">99.9%</div><div className="text-xs text-neutral-500">Uptime</div></div>
-                      </div>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-neutral-900/50 p-4 rounded-2xl border border-neutral-800">
+                  <div className="text-neutral-500 text-xs font-semibold uppercase mb-1">Revenue</div>
+                  <div className="text-2xl font-bold text-white">$124.5k</div>
+                  <div className="text-green-500 text-xs flex items-center mt-1">
+                    <TrendingUp className="w-3 h-3 mr-1" /> +12.5%
                   </div>
-              </div>
-              {/* Consumer Card */}
-              <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-2 shadow-2xl ring-1 ring-white/5 hover:border-pink-500/50 transition-all relative overflow-hidden">
-                  <div className="absolute -bottom-8 -left-8 w-24 h-24 border border-white/10 rounded-2xl float-fast" />
-                  <div className="bg-black rounded-2xl overflow-hidden h-full flex flex-col p-6">
-                      <div className="border-b border-neutral-800 pb-4 mb-4 flex justify-between"><span className="text-xs font-bold text-pink-400 uppercase">Personal Mode</span></div>
-                      <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700 mb-4 flex items-center space-x-4">
-                          <Music className="w-10 h-10 text-pink-500 bg-pink-500/20 p-2 rounded-lg" />
-                          <div><div className="text-white font-bold">Design Flow</div><div className="text-xs text-neutral-500">2m ago</div></div>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-neutral-800/30 rounded-lg">
-                           <div className="flex items-center space-x-3"><Folder className="w-4 h-4 text-blue-400"/><span className="text-sm text-white">Assets</span></div>
-                           <span className="text-xs text-neutral-500">12 items</span>
-                      </div>
+                </div>
+                <div className="bg-neutral-900/50 p-4 rounded-2xl border border-neutral-800">
+                  <div className="text-neutral-500 text-xs font-semibold uppercase mb-1">Active Users</div>
+                  <div className="text-2xl font-bold text-white">8,402</div>
+                  <div className="text-neutral-400 text-xs flex items-center mt-1">
+                    <Users className="w-3 h-3 mr-1" /> Just now
                   </div>
-              </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Grid */}
-      <div className="bg-black py-28 border-t border-neutral-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10 flex-col md:flex-row">
-            <div>
-              <h3 className="text-3xl md:text-4xl text-white font-apple-bold">Capabilities</h3>
-              <p className="text-neutral-400 mt-2 max-w-2xl">Every feature is there to reduce friction and keep you moving.</p>
-            </div>
-            <div className="mt-6 md:mt-0 flex items-center space-x-3 text-xs uppercase tracking-widest text-neutral-500">
-              <span className="w-6 h-px bg-neutral-700" />
-              <span>Focus, Flow, Finish</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {FEATURES.map((feature, idx) => (
-              <div key={idx} className={`${feature.colSpan} ${feature.bg} border rounded-3xl p-8 relative overflow-hidden group hover:border-neutral-600 transition-all`}>
-                <div className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/10 spin-slow opacity-60" />
-                <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6">{feature.icon}</div>
-                  <h3 className="text-2xl font-bold mb-3 text-white">{feature.title}</h3>
-                  <p className="text-neutral-400">{feature.desc}</p>
                 </div>
               </div>
-            ))}
+
+              {/* Chart Mockup */}
+              <div className="h-32 flex items-end gap-2 justify-between px-2 opacity-80">
+                {[40, 65, 45, 80, 55, 90, 75].map((h, i) => (
+                  <div key={i} className="w-full bg-neutral-800 rounded-t-sm hover:bg-yellow-500 transition-colors duration-300 relative group" style={{ height: `${h}%` }}>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Agency Teaser Banner */}
-      <div className="w-full bg-neutral-950 border-y border-neutral-800 py-16 overflow-hidden relative">
-        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.08),transparent)] shimmer-bg" />
-        <div className="absolute -top-10 left-10 w-24 h-24 border border-white/10 rounded-full spin-slow" />
-        <div className="absolute -bottom-10 right-10 w-20 h-20 border border-white/10 rounded-2xl float-slow" />
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between relative z-10">
-          <div className="mb-6 md:mb-0 text-center md:text-left">
-            <h3 className="text-3xl mb-3 flex items-center justify-center md:justify-start text-white font-apple-bold">
-              <span className="text-rose-400 mr-3">✦</span> Fac Agency
-            </h3>
-            <p className="text-neutral-400 max-w-lg text-lg">
-              Launch faster with a brand and website built to convert.
+      {/* Bento Grid Section */}
+      <section className="px-6 py-20 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 max-w-2xl mx-auto">
+            <Badge>Ecosystem</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mt-6 mb-4">Everything in its place.</h2>
+            <p className="text-neutral-400">
+              A suite of tools designed to work together or stand alone. Choose what fits your workflow.
             </p>
           </div>
-          <button onClick={() => navigate('/agency')} className="px-8 py-3 bg-white text-black font-bold rounded-xl hover:bg-neutral-200 transition-all shadow-lg">
-            Try Free Demo
-          </button>
+
+          <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
+
+            {/* Large Featured Card: Fac Agency */}
+            <li className="list-none md:col-span-6 md:row-span-2 xl:col-span-4 xl:row-span-2 min-h-[14rem]">
+              <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-neutral-800 p-2 md:rounded-[1.5rem] md:p-3">
+                <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-neutral-900/50 border-neutral-800 p-6 shadow-sm dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6 group cursor-pointer" onClick={() => navigate('/agency-plans')}>
+                  <div className="relative flex flex-1 flex-col justify-between gap-3">
+                    <div className="space-y-3">
+                      <div className="bg-rose-500/10 text-rose-500 w-fit p-2 rounded-lg"><Code className="w-6 h-6" /></div>
+                      <h3 className="pt-0.5 text-xl font-semibold text-white md:text-3xl">Fac Agency</h3>
+                      <h2 className="text-neutral-400">Premium web development. From {agencyPrice}/mo.</h2>
+                    </div>
+                    <div className="mt-4 flex items-center text-rose-400 font-medium group-hover:translate-x-1 transition-transform">
+                      See Plans <ArrowRight className="w-4 h-4 ml-2" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            {/* Medium Card: Trayo */}
+            <li className="list-none md:col-span-6 md:row-span-1 xl:col-span-4 xl:row-span-1 min-h-[14rem]">
+              <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-neutral-800 p-2 md:rounded-[1.5rem] md:p-3">
+                <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-neutral-900/50 border-neutral-800 p-6 shadow-sm group cursor-pointer" onClick={() => navigate('/trayo')}>
+                  <div className="relative flex flex-1 flex-col justify-between gap-3">
+                    <div className="bg-indigo-500/10 text-indigo-500 w-fit p-2 rounded-lg"><Layers className="w-5 h-5" /></div>
+                    <h3 className="text-xl font-semibold text-white">Trayo</h3>
+                    <p className="text-neutral-400 text-sm">Minimal macOS file manager.</p>
+                  </div>
+                  <img src="/trayoicon.png" className="w-12 h-12 rounded-lg absolute bottom-4 right-4" alt="Trayo" />
+                </div>
+              </div>
+            </li>
+
+            {/* Medium Card: FlightIO */}
+            <li className="list-none md:col-span-6 md:row-span-1 xl:col-span-4 xl:row-span-1 min-h-[14rem]">
+              <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-neutral-800 p-2 md:rounded-[1.5rem] md:p-3">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-neutral-900/50 border-neutral-800 p-6 shadow-sm">
+                  <div className="absolute top-4 right-4"><span className="text-[10px] bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20 uppercase font-bold">Soon</span></div>
+                  <div className="relative flex flex-1 flex-col justify-between gap-3">
+                    <div className="bg-sky-500/10 text-sky-500 w-fit p-2 rounded-lg"><Plane className="w-5 h-5" /></div>
+                    <h3 className="text-xl font-semibold text-white">FlightIO</h3>
+                    <p className="text-neutral-400 text-sm">Real-time flight tracking.</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            {/* Wide Card: Stats */}
+            <li className="list-none md:col-span-12 md:row-span-1 xl:col-span-8 xl:row-span-1 min-h-[14rem]">
+              <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-neutral-800 p-2 md:rounded-[1.5rem] md:p-3">
+                <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
+                <div className="relative flex h-full flex-row items-center justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-neutral-900/50 border-neutral-800 p-8 shadow-sm">
+                  <div className="flex gap-12">
+                    <div>
+                      <div className="text-4xl font-bold text-white font-mono">35+</div>
+                      <div className="text-xs uppercase tracking-widest text-neutral-500 mt-1">Countries</div>
+                    </div>
+                    <div>
+                      <div className="text-4xl font-bold text-white font-mono">99.9%</div>
+                      <div className="text-xs uppercase tracking-widest text-neutral-500 mt-1">Uptime</div>
+                    </div>
+                  </div>
+                  <Shield className="w-16 h-16 text-neutral-800" />
+                </div>
+              </div>
+            </li>
+
+          </ul>
         </div>
-      </div>
+      </section>
+
+      {/* Globe Feature Section */}
+      <GlobeFeatureSection />
+
+      {/* Testimonials Section */}
+      <section className="py-32 relative z-10 w-full overflow-hidden">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center max-w-2xl mx-auto mb-16"
+          >
+            <Badge>Community</Badge>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mt-6 mb-4">What our users say</h2>
+            <p className="text-neutral-400">See what our customers have to say about us.</p>
+          </motion.div>
+
+          <div className="flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[600px] overflow-hidden">
+            <TestimonialsColumn testimonials={firstColumn} duration={25} />
+            <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={30} />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Footer Section */}
+      <section className="py-20 text-center relative z-10">
+        <h2 className="text-3xl font-bold text-white mb-6">Ready to upgrade your workflow?</h2>
+        <div className="flex justify-center gap-4">
+          <GradientButton onClick={() => navigate('/agency')}>
+            Get Started
+          </GradientButton>
+        </div>
+      </section>
+
     </div>
   );
 };
