@@ -114,8 +114,8 @@ const Home = ({ openContact, countryCode }) => {
             <RainbowButton onClick={() => navigate('/agency-plans')} className="h-12 w-48 text-base shadow-lg shadow-yellow-500/20">
               Start Building
             </RainbowButton>
-            <button onClick={() => navigate('/trayo')} className="px-6 py-2 text-neutral-400 hover:text-white font-medium transition-colors">
-              Explore Trayo
+            <button onClick={openContact} className="px-6 py-2 text-neutral-400 hover:text-white font-medium transition-colors">
+              Contact Sales
             </button>
           </div>
         </div>

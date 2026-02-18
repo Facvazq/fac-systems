@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Menu, X, ChevronDown, Search, Layers, Folder, 
+import {
+  Menu, X, ChevronDown, Search, Layers, Folder,
   Code, Mail, Check, Copy, Zap, MoreHorizontal, FileText,
-  Plane 
+  Plane
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-export const CONTACT_EMAIL = "facsystemshome@gmail.com";
+export const CONTACT_EMAIL = "sales@facsystems.dev";
 
 // ADDED "export" here so CountrySelector can use them
 export const REGIONS = {
@@ -63,36 +63,35 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled || isMenuOpen ? 'bg-black/90 backdrop-blur-xl border-b border-neutral-800' : 'bg-transparent'
-    }`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isMenuOpen ? 'bg-black/90 backdrop-blur-xl border-b border-neutral-800' : 'bg-transparent'
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          
+
           <div className="flex items-center space-x-8">
             <button onClick={() => navigate('/')} className="flex items-center space-x-3 group">
               <div className="relative w-10 h-10 flex items-center justify-center">
-                 <div className="absolute inset-0 bg-indigo-600 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity blur-lg"></div>
-                 <span className="text-2xl font-bold text-white tracking-tighter z-10">Fac.</span>
+                <div className="absolute inset-0 bg-indigo-600 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity blur-lg"></div>
+                <span className="text-2xl font-bold text-white tracking-tighter z-10">Fac.</span>
               </div>
               <span className="font-bold text-lg tracking-wide text-neutral-200 group-hover:text-white transition-colors">Systems</span>
             </button>
-            
+
             <div className="hidden lg:flex items-center space-x-1">
-              <button 
-                onClick={() => navigate('/trayo')} 
+              <button
+                onClick={() => navigate('/trayo')}
                 className={`px-4 py-2 text-sm font-medium transition-colors rounded-full hover:bg-neutral-800/50 ${location.pathname === '/trayo' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}
               >
                 Trayo
               </button>
-              <button 
-                onClick={() => navigate('/flightio')} 
+              <button
+                onClick={() => navigate('/flightio')}
                 className={`px-4 py-2 text-sm font-medium transition-colors rounded-full hover:bg-neutral-800/50 ${location.pathname === '/flightio' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}
               >
                 FlightIO
               </button>
-              <button 
-                onClick={() => navigate('/panel')} 
+              <button
+                onClick={() => navigate('/panel')}
                 className="px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold uppercase tracking-wider hover:bg-blue-500 transition-colors shadow-[0_0_18px_rgba(37,99,235,0.35)]"
               >
                 Panel
@@ -105,7 +104,7 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
 
           <div className="hidden lg:flex items-center space-x-4">
             <div className="relative" ref={countryMenuRef}>
-              <button 
+              <button
                 onClick={() => setIsCountryOpen((prev) => !prev)}
                 className="flex items-center space-x-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors px-3 py-2 rounded-full hover:bg-neutral-800"
                 aria-haspopup="listbox"
@@ -123,11 +122,10 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
                       <button
                         key={country.code}
                         onClick={() => handleCountrySelect(country)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors ${
-                          activeCountry.code === country.code
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors ${activeCountry.code === country.code
                             ? 'bg-neutral-800 text-white'
                             : 'text-neutral-300 hover:bg-neutral-800/70 hover:text-white'
-                        }`}
+                          }`}
                         role="option"
                         aria-selected={activeCountry.code === country.code}
                       >
@@ -139,8 +137,8 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
                 </div>
               )}
             </div>
-            
-            <button 
+
+            <button
               onClick={openContact}
               className="text-sm font-medium bg-white text-black px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
@@ -159,10 +157,10 @@ export const Navbar = ({ openContact, currentCountry, onCountryChange }) => {
       {isMenuOpen && (
         <div className="lg:hidden absolute top-20 left-0 right-0 bg-neutral-900 border-b border-neutral-800 p-4 shadow-2xl animate-in slide-in-from-top-5 duration-200">
           <div className="flex flex-col space-y-4">
-             <button onClick={() => { navigate('/trayo'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">Trayo</button>
-             <button onClick={() => { navigate('/flightio'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">FlightIO</button>
-             <button onClick={() => { navigate('/panel'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-blue-300 hover:bg-neutral-800 rounded-lg">Panel</button>
-             <button onClick={() => { navigate('/agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-emerald-300 hover:bg-neutral-800 rounded-lg">Agency</button>
+            <button onClick={() => { navigate('/trayo'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">Trayo</button>
+            <button onClick={() => { navigate('/flightio'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-neutral-300 hover:bg-neutral-800 rounded-lg">FlightIO</button>
+            <button onClick={() => { navigate('/panel'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-blue-300 hover:bg-neutral-800 rounded-lg">Panel</button>
+            <button onClick={() => { navigate('/agency'); setIsMenuOpen(false); }} className="text-left font-medium p-2 text-emerald-300 hover:bg-neutral-800 rounded-lg">Agency</button>
             <div className="h-px bg-neutral-800 my-2"></div>
             <button onClick={openContact} className="text-center font-medium p-3 bg-white text-black rounded-lg">Contact Sales</button>
           </div>
@@ -226,14 +224,14 @@ export const ContactModal = ({ isOpen, onClose }) => {
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Contact Sales</h2>
           <p className="text-neutral-400 mb-8">Reach out to our team directly. We typically respond within 24 hours.</p>
-          
+
           <div className="flex items-center justify-between bg-black border border-neutral-800 rounded-xl p-4 mb-6 group hover:border-neutral-600 transition-colors">
             <span className="text-white font-mono text-sm break-all">{CONTACT_EMAIL}</span>
             <button onClick={handleCopy} className="ml-4 p-2 hover:bg-neutral-800 rounded-lg text-neutral-400 hover:text-white transition-colors">
               {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
             </button>
           </div>
-          
+
           <button onClick={() => window.location.href = `mailto:${CONTACT_EMAIL}`} className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-neutral-200 transition-colors">
             Open Email Client
           </button>
@@ -245,98 +243,98 @@ export const ContactModal = ({ isOpen, onClose }) => {
 
 export const AppleLogo = ({ className }) => (
   <svg viewBox="0 0 384 512" fill="currentColor" className={className}>
-    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z"/>
+    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.3-11.4 69.5-34.3z" />
   </svg>
 );
 
 export const AnimatedTrayo = () => (
-    <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex flex-col items-center justify-center border border-neutral-800 relative overflow-hidden">
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-3/4 max-w-sm h-8 bg-neutral-800/80 rounded-lg flex items-center justify-end px-3 space-x-3 border border-neutral-700 backdrop-blur-sm z-10">
-            <div className="text-white text-[10px]">9:41 AM</div>
-            <Search className="w-3 h-3 text-white" />
-            <div className="w-4 h-4 bg-indigo-500 rounded-sm flex items-center justify-center animate-pulse">
-                <Layers className="w-3 h-3 text-white" />
-            </div>
-        </div>
-        <div className="mt-16 w-64 bg-neutral-800/90 backdrop-blur-md rounded-xl border border-neutral-700 shadow-2xl p-2 animate-in slide-in-from-top-4 duration-700 z-0">
-            <div className="px-3 py-2 border-b border-neutral-700 flex justify-between items-center">
-                <span className="text-xs font-bold text-white">Trayo</span>
-                <span className="text-[10px] text-neutral-400">⌘ + ⇧ + Space</span>
-            </div>
-            <div className="p-1 space-y-1 mt-1">
-                <div className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
-                    <Folder className="w-4 h-4 text-blue-400 mr-3" />
-                    <div>
-                        <div className="text-xs text-white group-hover:text-indigo-200">Downloads</div>
-                        <div className="text-[10px] text-neutral-500">2 mins ago</div>
-                    </div>
-                </div>
-                <div className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
-                    <Folder className="w-4 h-4 text-blue-400 mr-3" />
-                    <div>
-                        <div className="text-xs text-white group-hover:text-indigo-200">Documents</div>
-                        <div className="text-[10px] text-neutral-500">Yesterday</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div className="w-full h-full bg-neutral-900 rounded-xl p-6 flex flex-col items-center justify-center border border-neutral-800 relative overflow-hidden">
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-3/4 max-w-sm h-8 bg-neutral-800/80 rounded-lg flex items-center justify-end px-3 space-x-3 border border-neutral-700 backdrop-blur-sm z-10">
+      <div className="text-white text-[10px]">9:41 AM</div>
+      <Search className="w-3 h-3 text-white" />
+      <div className="w-4 h-4 bg-indigo-500 rounded-sm flex items-center justify-center animate-pulse">
+        <Layers className="w-3 h-3 text-white" />
+      </div>
     </div>
+    <div className="mt-16 w-64 bg-neutral-800/90 backdrop-blur-md rounded-xl border border-neutral-700 shadow-2xl p-2 animate-in slide-in-from-top-4 duration-700 z-0">
+      <div className="px-3 py-2 border-b border-neutral-700 flex justify-between items-center">
+        <span className="text-xs font-bold text-white">Trayo</span>
+        <span className="text-[10px] text-neutral-400">⌘ + ⇧ + Space</span>
+      </div>
+      <div className="p-1 space-y-1 mt-1">
+        <div className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
+          <Folder className="w-4 h-4 text-blue-400 mr-3" />
+          <div>
+            <div className="text-xs text-white group-hover:text-indigo-200">Downloads</div>
+            <div className="text-[10px] text-neutral-500">2 mins ago</div>
+          </div>
+        </div>
+        <div className="flex items-center p-2 hover:bg-indigo-600/20 rounded cursor-pointer group">
+          <Folder className="w-4 h-4 text-blue-400 mr-3" />
+          <div>
+            <div className="text-xs text-white group-hover:text-indigo-200">Documents</div>
+            <div className="text-[10px] text-neutral-500">Yesterday</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 );
 
 export const TrayoFeatureGraphic = () => (
-    <div className="w-full h-full bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent"></div>
-        <div className="p-6 relative z-10 h-full flex flex-col justify-center">
-            <div className="bg-black/80 backdrop-blur-md border border-neutral-700 rounded-xl p-4 mb-4 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
-                <div className="flex items-center space-x-3 mb-3 border-b border-neutral-800 pb-3">
-                    <Command className="w-4 h-4 text-indigo-400" />
-                    <span className="text-xs font-mono text-neutral-400">Spotlight Search</span>
-                </div>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <FileText className="w-8 h-8 text-blue-400 bg-blue-500/10 p-1.5 rounded-lg" />
-                        <div>
-                            <div className="text-sm font-bold text-white">Q4_Report.pdf</div>
-                            <div className="text-[10px] text-neutral-500">/Documents/Work</div>
-                        </div>
-                    </div>
-                    <div className="text-[10px] bg-neutral-800 px-2 py-1 rounded text-neutral-400">Enter</div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-                <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
-                    <Zap className="w-5 h-5 text-yellow-400 mb-2" />
-                    <span className="text-[10px] text-white">Quick Drop</span>
-                </div>
-                <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
-                    <MoreHorizontal className="w-5 h-5 text-purple-400 mb-2" />
-                    <span className="text-[10px] text-white">Actions</span>
-                </div>
-            </div>
+  <div className="w-full h-full bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden relative">
+    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent"></div>
+    <div className="p-6 relative z-10 h-full flex flex-col justify-center">
+      <div className="bg-black/80 backdrop-blur-md border border-neutral-700 rounded-xl p-4 mb-4 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
+        <div className="flex items-center space-x-3 mb-3 border-b border-neutral-800 pb-3">
+          <Command className="w-4 h-4 text-indigo-400" />
+          <span className="text-xs font-mono text-neutral-400">Spotlight Search</span>
         </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <FileText className="w-8 h-8 text-blue-400 bg-blue-500/10 p-1.5 rounded-lg" />
+            <div>
+              <div className="text-sm font-bold text-white">Q4_Report.pdf</div>
+              <div className="text-[10px] text-neutral-500">/Documents/Work</div>
+            </div>
+          </div>
+          <div className="text-[10px] bg-neutral-800 px-2 py-1 rounded text-neutral-400">Enter</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
+          <Zap className="w-5 h-5 text-yellow-400 mb-2" />
+          <span className="text-[10px] text-white">Quick Drop</span>
+        </div>
+        <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 flex flex-col items-center justify-center hover:bg-neutral-800 transition-colors">
+          <MoreHorizontal className="w-5 h-5 text-purple-400 mb-2" />
+          <span className="text-[10px] text-white">Actions</span>
+        </div>
+      </div>
     </div>
+  </div>
 );
 
 export const AnimatedAgency = () => (
-    <div className="w-full h-full bg-neutral-950 rounded-xl p-2 border border-neutral-800 flex flex-col font-mono text-[10px]">
-        <div className="flex gap-1.5 mb-2 p-2 border-b border-neutral-800">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-        </div>
-        <div className="p-2 text-indigo-400">
-            <div>&lt;html&gt;</div>
-            <div className="pl-2">&lt;body&gt;</div>
-            <div className="pl-4 text-white">&lt;h1&gt;Building Your Future&lt;/h1&gt;</div>
-            <div className="pl-4 text-neutral-500">&lt;!-- Fac Agency Magic --&gt;</div>
-            <div className="pl-2">&lt;/body&gt;</div>
-        </div>
-        <div className="mt-auto p-2">
-            <div className="w-full h-1 bg-indigo-500/20 rounded-full overflow-hidden">
-                <div className="w-full h-full bg-indigo-500 animate-pulse origin-left transform scale-x-75"></div>
-            </div>
-            <div className="text-right text-indigo-500 mt-1">Compiling...</div>
-        </div>
+  <div className="w-full h-full bg-neutral-950 rounded-xl p-2 border border-neutral-800 flex flex-col font-mono text-[10px]">
+    <div className="flex gap-1.5 mb-2 p-2 border-b border-neutral-800">
+      <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+      <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
     </div>
+    <div className="p-2 text-indigo-400">
+      <div>&lt;html&gt;</div>
+      <div className="pl-2">&lt;body&gt;</div>
+      <div className="pl-4 text-white">&lt;h1&gt;Building Your Future&lt;/h1&gt;</div>
+      <div className="pl-4 text-neutral-500">&lt;!-- Fac Agency Magic --&gt;</div>
+      <div className="pl-2">&lt;/body&gt;</div>
+    </div>
+    <div className="mt-auto p-2">
+      <div className="w-full h-1 bg-indigo-500/20 rounded-full overflow-hidden">
+        <div className="w-full h-full bg-indigo-500 animate-pulse origin-left transform scale-x-75"></div>
+      </div>
+      <div className="text-right text-indigo-500 mt-1">Compiling...</div>
+    </div>
+  </div>
 );

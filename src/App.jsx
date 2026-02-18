@@ -27,16 +27,16 @@ const Layout = () => {
           onCountryChange={setSelectedCountry}
         />
       )}
-      
+
       {/* Route Definitions - Wrapped in main for flex-grow */}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home openContact={() => setIsContactOpen(true)} countryCode={selectedCountry.code} />} />
-          <Route path="/trayo" element={<Trayo />} />
+          <Route path="/trayo" element={<Trayo openContact={() => setIsContactOpen(true)} />} />
           <Route path="/panel" element={<Panel />} />
           <Route path="/panel-config" element={<PanelConfig />} />
           <Route path="/flightio" element={<FlightIO />} />
-          <Route path="/country" element={<CountrySelector setCountry={() => {}} />} />
+          <Route path="/country" element={<CountrySelector setCountry={() => { }} />} />
           <Route path="/agency" element={<FacAgency openContact={() => setIsContactOpen(true)} countryCode={selectedCountry.code} />} />
           <Route path="/agency-plans" element={<AgencyPlans openContact={() => setIsContactOpen(true)} countryCode={selectedCountry.code} />} />
           <Route path="/livedemo" element={<LiveDemoPage />} />
@@ -45,7 +45,7 @@ const Layout = () => {
 
       {/* Footer appears on all pages */}
       <Footer openContact={() => setIsContactOpen(true)} />
-      
+
       {/* Global Contact Modal */}
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </div>
